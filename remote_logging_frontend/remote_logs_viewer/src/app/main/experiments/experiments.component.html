@@ -1,0 +1,55 @@
+<div *ngIf="!items" class="loader">
+  <ion-spinner color="primary"></ion-spinner>
+</div>
+<ion-list *ngIf="items">
+  <ion-item-sliding *ngFor="let experiment of items">
+    <ion-item-options side="start">
+      <ion-item-option color="danger" (click)="onRemoveClick(experiment)">
+        <ion-icon class="menu-icon ml2 mr2" name="trash-outline"></ion-icon>
+      </ion-item-option>
+    </ion-item-options>
+    <ion-item [button]="true" (click)="onExperimentClick(experiment)">
+      <app-status-dot
+        class="mr2 block"
+        [failed]="experiment.last_run?.has_errors"
+        [finished]="experiment.last_run?.finished !== undefined && experiment.last_run?.finished !== null"
+        [neverRunned]="experiment.last_run === null"
+      ></app-status-dot>
+      <ion-label>
+        <div class="bold class mb1 list-main-label">
+          {{ experiment.name }}
+          <span class="finished-configs-info" *ngIf="experiment.last_run">
+            ({{ experiment.last_run.finished_configs }}/{{
+              experiment.last_run.number_of_configs
+            }})
+          </span>
+        </div>
+        <span
+          class="last-run-info"
+          *ngIf="experiment.last_run && experiment.last_run.finished"
+        >
+          {{ "experiments.finished" | translate }}
+          {{ experiment.last_run.finished | date: "yyyy.MM.dd HH:mm:ss" }}
+        </span>
+        <span
+          class="last-run-info"
+          *ngIf="experiment.last_run && !experiment.last_run.finished"
+        >
+          {{ "experiments.started" | translate }}
+          {{ experiment.last_run.started | date: "yyyy.MM.dd HH:mm:ss" }}
+        </span>
+        <span class="last-run-info" *ngIf="!experiment.last_run">
+          {{ "experiments.never_run" | translate }}
+        </span>
+        <ion-progress-bar
+          *ngIf="experiment.last_run && !experiment.last_run.finished"
+          [value]="
+            experiment.last_run.finished_configs /
+            experiment.last_run.number_of_configs
+          "
+          class="progress-bar mt2"
+        ></ion-progress-bar>
+      </ion-label>
+    </ion-item>
+  </ion-item-sliding>
+</ion-list>

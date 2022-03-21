@@ -1,0 +1,33 @@
+<div class="wrapper">
+  <ion-card class="login-card">
+    <ion-card-header>
+      <ion-card-title class="text-center">Welcome</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form [formGroup]="form">
+        <ion-item>
+          <ion-label position="stacked">Login</ion-label>
+          <ion-input formControlName="login"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Password</ion-label>
+          <ion-input type="password" formControlName="password"></ion-input>
+        </ion-item>
+      </form>
+      <ion-item *ngIf="invalidCredentials">
+        <ion-label color="danger"> Invalid credentials </ion-label>
+      </ion-item>
+      <ion-button
+        (click)="onLoginClick()"
+        [disabled]="!form.valid"
+        expand="block mt3"
+        >Log in</ion-button
+      >
+    </ion-card-content>
+  </ion-card>
+</div>
+
+<div class="overlay" *ngIf="loading">
+  <ion-spinner color="primary"></ion-spinner>
+</div>

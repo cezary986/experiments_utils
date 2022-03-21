@@ -1,0 +1,50 @@
+{
+  "app_title": "Experiments monitor",
+  "context_menu": {
+    "logout": "Log out"
+  },
+  "experiments": {
+    "finished": "finished: ",
+    "started": "started: ",
+    "never_run": "never run",
+    "remove_confirm": {
+      "title": "Confirm",
+      "content": "Are your sure you want to remove \"{{ experimentName }}\" experiment and all its data?"
+    },
+    "removed": "Experiment \"{{ experimentName }}\" removed"
+  },
+  "runs": {
+    "remove_confirm": {
+      "title": "Confirm",
+      "content": "Are your sure you want to remove logs about this experiment run?"
+    },
+    "removed": "Experiment run data removed"
+  },
+  "run": {
+    "details": "Details",
+    "logs": "Logs",
+    "still_running": "Still running...",
+    "configs_number": "number of configs:",
+    "steps": "steps:",
+    "finished_configs": "finished configs:",
+    "failed_configs": "failed configs:",
+    "running_configs": "running configs:",
+    "current_step": "current step:",
+    "status": "status:",
+    "took": "took: ",
+    "days": "days"
+  },
+  "errors": {
+    "no_connection": "No connection with server",
+    "server_error": "Server error occured",
+    "app_error": "Unknown app error occured"
+  },
+  "logs": {
+    "filters": {
+      "title": "Show logs by level",
+      "all": "show all"
+    }
+  },
+  "yes": "yes",
+  "no": "no"
+}

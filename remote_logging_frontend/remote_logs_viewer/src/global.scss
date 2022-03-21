@@ -1,0 +1,80 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import "~@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+@import "../node_modules/basscss/css/basscss-important.min.css";
+
+.overlay {
+  width: 100vw;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  z-index: 100;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.ripple-parent {
+  position: relative;
+  overflow: hidden;
+}
+
+.loader {
+  display: flex;
+  width: 100vw;
+  height: 100px;
+  align-items: center;
+  justify-content: center;
+}
+
+:root {
+  --gray: gray;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.list-main-label {
+  font-size: 1.2rem;
+}
+
+.ripple-parent {
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  line-height: 0;
+}
+

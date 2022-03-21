@@ -1,0 +1,66 @@
+<ion-app>
+  <ion-header>
+    <ion-toolbar color="primary" *ngIf="currentUser | async">
+      <ion-buttons *ngIf="navigationService.isNested" slot="start">
+        <ion-button (click)="goBack()">
+          <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="primary">
+        <!-- ACTIONS -->
+        <ion-button
+          *ngFor="let action of appBarActions | async"
+          (click)="action.handler()"
+        >
+          <ion-icon slot="icon-only" name="{{ action.icon }}"></ion-icon>
+        </ion-button>
+
+        <ion-button id="context-menu-button">
+          <ion-icon
+            slot="icon-only"
+            ios="ellipsis-horizontal"
+            md="ellipsis-vertical"
+          ></ion-icon>
+        </ion-button>
+        <ion-popover
+          trigger="context-menu-button"
+          [dismissOnSelect]="true"
+          [showBackdrop]="false"
+        >
+          <ng-template>
+            <ion-list>
+              <ion-item (click)="onLogoutClick()">
+                <ion-label class="bold">
+                  {{ (currentUser | async).username }}
+                </ion-label>
+              </ion-item>
+              <ion-item
+                (click)="onLogoutClick()"
+                [button]="true"
+                [detail]="false"
+              >
+                <ion-label class="flex">
+                  {{ "context_menu.logout" | translate }}
+                  <span class="spacer"></span>
+                  <ion-icon
+                    color="primary"
+                    class="menu-icon"
+                    name="log-out-outline"
+                  ></ion-icon>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ng-template>
+        </ion-popover>
+      </ion-buttons>
+
+      <ion-title>{{ "app_title" | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content> </ion-refresher-content>
+    </ion-refresher>
+    <ion-router-outlet></ion-router-outlet>
+  </ion-content>
+</ion-app>

@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+.wrapper {
+  height: 30px;
+  width: 30px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dot {
+  display: block;
+  min-height: 19px;
+  min-width: 19px;
+  height: 19px;
+  width: 19px;
+  border-radius: 100%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  &.error {
+    background-color: var(--ion-color-danger);
+  }
+
+  &.finished {
+    background-color: var(--ion-color-success);
+  }
+
+  &.never-runned {
+    background-color: var(--gray);
+  }
+}
+
+ion-spinner {
+  z-index: 2;
+}

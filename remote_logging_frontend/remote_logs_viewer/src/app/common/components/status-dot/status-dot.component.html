@@ -1,0 +1,11 @@
+<div class="wrapper">
+  <ion-spinner *ngIf="!finished && !neverRunned" color="primary"></ion-spinner>
+  <span
+    class="dot"
+    [ngClass]="{
+      error: failed,
+      finished: finished && !failed,
+      'never-runned': neverRunned
+    }"
+  ></span>
+</div>
