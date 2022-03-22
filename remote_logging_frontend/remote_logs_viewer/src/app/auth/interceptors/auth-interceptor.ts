@@ -4,8 +4,10 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
+  HttpHeaders,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -14,7 +16,10 @@ export class AuthInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    request = request.clone({ withCredentials: true });
+    const headers: HttpHeaders = new HttpHeaders({
+      Authorization: `Token ${localStorage.getItem(AuthService.TOKEN_KEY)}`
+    });
+    request = request.clone({ withCredentials: true, headers: headers });
     return next.handle(request);
   }
 }

@@ -19,6 +19,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { CommonErrorHandler } from './common/errors/error-handler';
+import { APP_BASE_HREF } from '@angular/common';
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(
@@ -54,6 +55,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
       provide: ErrorHandler,
       useClass: CommonErrorHandler,
     },
+    { provide: APP_BASE_HREF, useValue: environment.baseHref },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

@@ -12,6 +12,8 @@ import { NavController } from '@ionic/angular';
   providedIn: 'root',
 })
 export class AuthService {
+  public static readonly TOKEN_KEY = 'token';
+
   private loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     true
   );
@@ -46,9 +48,12 @@ export class AuthService {
     return this.loggedIn;
   }
 
-  public login(username: string, password: string): Observable<void> {
+  public login(
+    username: string,
+    password: string
+  ): Observable<{ token: string }> {
     return this.http
-      .post<void>(
+      .post<{ token: string }>(
         `${environment.baseApiUrl}/auth/login`,
         {
           username: username,
@@ -60,6 +65,7 @@ export class AuthService {
       )
       .pipe(
         map((res) => {
+          localStorage.setItem(AuthService.TOKEN_KEY, res.token);
           this.fetchCurrentUser();
           this.loggedIn.next(true);
           return res;

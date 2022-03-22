@@ -1,12 +1,13 @@
 import json
 import logging
+from re import A
 import sys
 import os
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework import status
@@ -14,6 +15,8 @@ from api.serializers import *
 from api.models import *
 from django.http.response import JsonResponse
 from django.contrib import auth
+from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication, BasicAuthentication
 from api.notifications import send_notification
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(f'{dir_path}/../scrappers')
@@ -32,6 +35,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CurrentUserView(APIView):
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -46,10 +50,13 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
     http_method_names = ['get']
 
 
 class LoginView(APIView):
+
+    authentication_classes = []
 
     def post(self, request):
         try:
@@ -62,20 +69,29 @@ class LoginView(APIView):
 
         user = auth.authenticate(request, username=username, password=password)
         if user is not None:
-            auth.login(request, user)
-            return JsonResponse({'message': 'Logged in'}, status=200)
+            token, created = Token.objects.get_or_create(user=user)
+            return JsonResponse({
+                'token': token.key
+            }, status=200)
         else:
             return JsonResponse({'message': 'Invalid login or password'}, status=401)
 
 
 class LogoutView(APIView):
 
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
+        token, created = Token.objects.get_or_create(user=request.user)
+        token.delete()
         auth.logout(request)
         return JsonResponse({'message': 'Logged out'}, status=200)
 
 
 class LoginCheck(APIView):
+
+    authentication_classes = []
 
     def get(self, request):
         return JsonResponse({'logged_in': request.user.is_authenticated}, status=200)
@@ -85,6 +101,7 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
     pagination_class = None
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
 
     def destroy(self, request, pk):
         run: ExperimentRun = get_object_or_404(
@@ -133,7 +150,8 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
                 run.has_errors = True
                 break
         run.finished = request_json.get('finished', None)
-        run.finished_configs = request_json.get('finished_configs', run.finished_configs)
+        run.finished_configs = request_json.get(
+            'finished_configs', run.finished_configs)
         run.configs_execution = request_json['configs_execution']
         run.save()
         if request_json.get('has_errors', False):
@@ -143,6 +161,7 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
                 message=f'Error during experiment execution'
             )
         return JsonResponse({'message': "updated"}, safe=False, status=status.HTTP_202_ACCEPTED)
+
 
 class ExperimentsViewSet(viewsets.ModelViewSet):
 
@@ -155,6 +174,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     queryset = Experiment.objects.all()
     serializer_class = ExperimentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
     http_method_names = ['get', 'post', 'delete']
     pagination_class = None
 
@@ -171,6 +191,7 @@ class LogEntryViewSet(viewsets.ViewSet):
 
     http_method_names = ['get', 'post', 'delete']
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
     pagination_class = LimitOffsetPagination
 
     def __init__(self, **kwargs) -> None:
@@ -219,10 +240,3 @@ class LogEntryViewSet(viewsets.ViewSet):
                 'errors': [str(error) for error in serializer.errors]
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
-class ExperimentStepView(APIView):
-
-    def post(self, request):
-        body: dict = request.data
-        auth.logout(request)
-        return JsonResponse(status=200)
