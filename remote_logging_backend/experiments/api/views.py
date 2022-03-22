@@ -105,13 +105,13 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk):
         run: ExperimentRun = get_object_or_404(
-            ExperimentRun.objects.select_for_update(), pk=pk)
+            ExperimentRun, pk=pk)
         run.delete()
         return JsonResponse({'message': 'deleted'}, status=200)
 
     def retrieve(self, request, pk):
         run: ExperimentRun = get_object_or_404(
-            ExperimentRun.objects.select_for_update(), pk=pk)
+            ExperimentRun.objects, pk=pk)
         serializer = ExperimentRunSerializer(run, context={'request': request})
         return JsonResponse(serializer.data, safe=False)
 
@@ -143,7 +143,7 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         run: ExperimentRun = get_object_or_404(
-            ExperimentRun.objects.select_for_update(), pk=pk)
+            ExperimentRun, pk=pk)
         request_json = request.data
         for value in request_json['configs_execution'].values():
             if value['has_errors']:
@@ -239,4 +239,3 @@ class LogEntryViewSet(viewsets.ViewSet):
                 'request_body': request.data,
                 'errors': [str(error) for error in serializer.errors]
             }, status=status.HTTP_400_BAD_REQUEST)
-
