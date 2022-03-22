@@ -23,3 +23,4 @@ migrations/
 /remote_logging_backend/experiments/experiments/settings.py
 remote_logging_frontend/remote_logs_viewer/src/manifest.json
 remote_logging_backend/experiments/experiments/dev_settings.py
+remote_logging_backend/experiments/frontend/manifest.json

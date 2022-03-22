@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
 class Experiment(models.Model):
     name = models.CharField(max_length=200, null=False, unique=True)
     description = models.TextField(null=True, blank=True)
-    last_run = models.ForeignKey('ExperimentRun', default=None, related_name='experiment_last_run', on_delete=models.DO_NOTHING, null=True, blank=True)
+    last_run = models.ForeignKey('api.ExperimentRun', default=None, related_name='experiment_last_run', on_delete=models.DO_NOTHING, null=True, blank=True)
     is_running = models.BooleanField(default=False, null=False, blank=True)   
 
     def __str__(self) -> str:

@@ -41,12 +41,16 @@ export class AppComponent implements OnInit {
               console.log(currentToken);
             } else {
               this.notificationsAllowed = false;
-              throw new AppError(this.translate.instant('errors.notifications_error'));
+              throw new AppError(
+                this.translate.instant('errors.notifications_error')
+              );
             }
           })
           .catch((err) => {
             this.notificationsAllowed = false;
-            throw new AppError(this.translate.instant('errors.notifications_error'));
+            throw new AppError(
+              this.translate.instant('errors.notifications_error')
+            );
           });
       }
     });
@@ -71,8 +75,6 @@ export class AppComponent implements OnInit {
     this.authService.authorized.subscribe((authorized: boolean) => {
       if (authorized) {
         this.firebaseApp = initializeApp(environment.firebaseConfig);
-      } else {
-        deleteApp(this.firebaseApp);
       }
     });
   }

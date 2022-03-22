@@ -21,7 +21,11 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { CommonErrorHandler } from './common/errors/error-handler';
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  return new TranslateHttpLoader(
+    http,
+    environment.translationsBaseUrl,
+    '.json'
+  );
 }
 
 @NgModule({
