@@ -109,6 +109,7 @@ class RemoteLogsHandler(logging.StreamHandler):
             '[%(levelname)s] %(asctime)s %(message)s')
         fh.setFormatter(formatter)
         fh.setLevel(logging.INFO)
+        logging.getLogger("urllib3").level = logging.FATAL
         logging.getLogger("urllib3").disabled = True
         logger.addHandler(fh)
         logger.propagate = False

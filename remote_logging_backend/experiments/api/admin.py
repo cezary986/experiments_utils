@@ -1,6 +1,7 @@
 from django.contrib import admin
 from api.models import *
 
+admin.site.register(CustomUser)
 
 class ExperimentAdmin(admin.ModelAdmin):
     readonly_fields = (
@@ -11,3 +12,4 @@ class ExperimentAdmin(admin.ModelAdmin):
 admin.site.register(Experiment, ExperimentAdmin)
 admin.site.register(ExperimentRun)
 admin.site.register(LogEntry)
+
