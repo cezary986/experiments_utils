@@ -29,6 +29,7 @@
     "@ngx-translate/http-loader": "^6.0.0",
     "@ngxs/store": "^3.7.3",
     "basscss": "^8.0.2",
+    "firebase": "^9.6.9",
     "ionicons": "^6.0.1",
     "nanoid": "^3.3.1",
     "rxjs": "~6.6.0",

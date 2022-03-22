@@ -60,6 +60,7 @@ export class RunDetailsComponent {
   public configsFinished: ConfigExecution[];
   public configsRunning: ConfigExecution[];
   public steps: string[];
+  public errorDetailesCollapsedFlags = {};
 
   constructor(
     private translate: TranslateService,

@@ -18,10 +18,12 @@ export interface ConfigExecution {
   finished?: Date;
   has_errors?: boolean;
   steps_completed?: { [step_name: string]: Date };
+  error_message?: string;
+  stack_trace?: string;
   took?: {
-    days: number,
-    hours: number,
-    minutes: number,
-    seconds: number,
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
   };
 }

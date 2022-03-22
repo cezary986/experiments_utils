@@ -1,5 +1,3 @@
-
-from glob import glob
 import logging
 import threading
 import traceback
@@ -16,9 +14,6 @@ lock: threading.Lock = threading.Lock()
 
 
 class RemoteLogsHandler(logging.StreamHandler):
-
-    throttle_time_seconds: int = 10
-
     """Logging handler writing logs to remote server."""
 
     def __init__(
@@ -46,20 +41,19 @@ class RemoteLogsHandler(logging.StreamHandler):
         self.experiment_version: str = experiment_version
         self.config_name: str = config_name
         self.logger: logging.Logger = None
+        self._alive: bool = True
         self._setup_logger()
 
         self._fetch_run_id()
         self.messages_queue = []
-        self.last_emit_time = time.time()
 
         def flush_called():
-            while True:
-                time.sleep(2)
+            while self._alive:
+                time.sleep(settings.REMOTE_LOGGING_THROTTLE)
                 self.flush()
-                print('FLUSH!!!')
+                self.logger.info('Flushed')
         self.thread = Thread(target=flush_called, daemon=True)
         self.thread.start()
-
 
     def _create_experiment(self):
         """Create experiment on server (or does nothing if already exists)."""
@@ -115,10 +109,13 @@ class RemoteLogsHandler(logging.StreamHandler):
             '[%(levelname)s] %(asctime)s %(message)s')
         fh.setFormatter(formatter)
         fh.setLevel(logging.INFO)
-        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("urllib3").disabled = True
         logger.addHandler(fh)
         logger.propagate = False
         self.logger = logger
+
+    def terminate(self):
+        self._alive = False
 
     def format(self, record: logging.LogRecord, **kwargs) -> dict:
         """Format log entry."""
@@ -148,15 +145,17 @@ class RemoteLogsHandler(logging.StreamHandler):
         return message
 
     def flush(self, payload=None):
-        lock.acquire()
+
         if len(self.messages_queue) == 0:
             return
         headers = {'content-type': 'application/json'}
         url = f'{self.api_url}/api/logs/{self.run_id}/'
+        lock.acquire()
         if payload is not None:
             self.messages_queue.append(payload)
         response = requests.post(
             url, json=self.messages_queue, headers=headers, auth=settings.REMOTE_LOGGING_CREDENTIALS)
+
         self.messages_queue = []
         if lock.locked():
             lock.release()
@@ -165,37 +164,22 @@ class RemoteLogsHandler(logging.StreamHandler):
                 f'Failed to save logs to remote server "{self.api_url}". Server returned {response.status_code} status code and following error:')
             self.logger.error(response.text)
 
-
     def emit(self, record, **kwargs):
         """Save log entry to server."""
-        now = time.time()
-
-        if now - self.last_emit_time > RemoteLogsHandler.throttle_time_seconds:
-            try:
-                payload = self.format(record)
-                self.flush(payload)
-            except Exception as error:
-                self.logger.error(
-                    f'Failed to save logs to remote server "{self.api_url}" with following exception:')
-                self.logger.error(str(error))
-                self.logger.error(traceback.format_exc())
-            self.last_emit_time = now
-        else:
-            try:
-                message = self.format(record, **kwargs)
-                lock.acquire()
-                self.messages_queue.append(message)
+        try:
+            message = self.format(record, **kwargs)
+            lock.acquire()
+            self.messages_queue.append(message)
+            lock.release()
+        except Exception as error:
+            error_msg = f'Failed to format logs for remote server "{self.api_url}" with following exception:'
+            self.logger.error(error_msg)
+            self.logger.error(str(error))
+            self.logger.error(traceback.format_exc())
+            self.messages_queue.append(error_msg + str(error))
+        finally:
+            if lock.locked():
                 lock.release()
-
-            except Exception as error:
-                error_msg = f'Failed to format logs for remote server "{self.api_url}" with following exception:'
-                self.logger.error(error_msg)
-                self.logger.error(str(error))
-                self.logger.error(traceback.format_exc())
-                self.messages_queue.append(error_msg + str(error))
-            finally:
-                if lock.locked():
-                    lock.release()
 
     def log_step(self, config_name: str, current_step_index: int):
         try:
@@ -205,14 +189,15 @@ class RemoteLogsHandler(logging.StreamHandler):
             if config_name not in ExperimentConfig._configs_execution:
                 ExperimentConfig._configs_execution[config_name] = {
                     'has_errors': False,
-                    'finished': None
                 }
             ExperimentConfig._configs_execution[config_name] = {
                 **ExperimentConfig._configs_execution[config_name],
-                'config_name': config_name,
-                'steps': ExperimentConfig.steps_names,
-                'current_step': current_step_index,
-                'steps_completed': ExperimentConfig.steps_completed_times[config_name]
+                **{
+                    'config_name': config_name,
+                    'steps': ExperimentConfig.steps_names,
+                    'current_step': current_step_index,
+                    'steps_completed': ExperimentConfig.steps_completed_times[config_name]
+                }
             }
             payload = {
                 'configs_execution': ExperimentConfig._configs_execution
@@ -242,19 +227,23 @@ class RemoteLogsHandler(logging.StreamHandler):
                 ExperimentConfig._configs_execution[config_name] = {}
             ExperimentConfig._configs_execution[config_name] = {
                 **ExperimentConfig._configs_execution[config_name],
-                'config_name': config_name,
-                'steps': ExperimentConfig.steps_names,
-                'has_errors': True,
-                'finished': datetime.timestamp(datetime.now(tz=settings.EXPERIMENT_TIMEZONE)) * 1000,
-                'error_message': error_message,
-                'stack_trace': stack_trace
+                **{
+                    'config_name': config_name,
+                    'steps': ExperimentConfig.steps_names,
+                    'has_errors': True,
+                    'finished': datetime.timestamp(datetime.now(tz=settings.EXPERIMENT_TIMEZONE)) * 1000,
+                    'error_message': error_message,
+                    'stack_trace': stack_trace
+                }
             }
             payload = {
-                'finished_configs': len(ExperimentConfig.completed_configs[config_name]),
-                'finished': datetime.now(tz=settings.EXPERIMENT_TIMEZONE).strftime(
-                    f'%Y-%m-%d-%H:%M:%S'),
+                'has_errors': True,
+                'finished_configs': ExperimentConfig.completed_configs,
                 'configs_execution': ExperimentConfig._configs_execution
             }
+            if ExperimentConfig.completed_configs == ExperimentConfig.number_of_configs:
+                payload['finished'] = datetime.now(tz=settings.EXPERIMENT_TIMEZONE).strftime(
+                    f'%Y-%m-%d-%H:%M:%S')
             lock.release()
             response = requests.patch(
                 url, json=payload, headers=headers, auth=settings.REMOTE_LOGGING_CREDENTIALS)
@@ -281,17 +270,20 @@ class RemoteLogsHandler(logging.StreamHandler):
                 ExperimentConfig._configs_execution[config_name] = {}
             ExperimentConfig._configs_execution[config_name] = {
                 **ExperimentConfig._configs_execution[config_name],
-                'config_name': config_name,
-                'steps': ExperimentConfig.steps_names,
-                'has_errors': False,
-                'finished_configs': len(ExperimentConfig.completed_configs[config_name]),
-                'finished': datetime.timestamp(datetime.now(tz=settings.EXPERIMENT_TIMEZONE)) * 1000,
+                **{
+                    'config_name': config_name,
+                    'steps': ExperimentConfig.steps_names,
+                    'has_errors': False,
+                    'finished': datetime.timestamp(datetime.now(tz=settings.EXPERIMENT_TIMEZONE)) * 1000,
+                }
             }
             payload = {
-                'finished': datetime.now(tz=settings.EXPERIMENT_TIMEZONE).strftime(
-                    f'%Y-%m-%d-%H:%M:%S'),
+                'finished_configs': ExperimentConfig.completed_configs,
                 'configs_execution': ExperimentConfig._configs_execution
             }
+            if ExperimentConfig.completed_configs == ExperimentConfig.number_of_configs:
+                payload['finished'] = datetime.now(tz=settings.EXPERIMENT_TIMEZONE).strftime(
+                    f'%Y-%m-%d-%H:%M:%S')
             lock.release()
             response = requests.patch(
                 url, json=payload, headers=headers, auth=settings.REMOTE_LOGGING_CREDENTIALS)

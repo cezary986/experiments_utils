@@ -1,0 +1,4 @@
+{
+    "gcm_sender_id": "Sender ID",
+    "TODO": "Go to firebase project settings to get sender id for cloud messaging"
+}

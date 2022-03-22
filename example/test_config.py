@@ -1,4 +1,5 @@
 
+import _
 from typing import Dict
 import experiments_utils.settings as settings
 
@@ -21,7 +22,7 @@ CONFIGURATIONS: Dict[str, dict] = {
         'b': 2,
     },
     '3': {
-        'a': None,
+        'a': 1,
         'b': 2,
     },
     '4': {
@@ -29,7 +30,7 @@ CONFIGURATIONS: Dict[str, dict] = {
         'b': 2
     },
     '5': {
-        'a': 1,
+        'a': None,
         'b': 2
     },
     '6': {

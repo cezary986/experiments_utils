@@ -42,6 +42,10 @@ export class AuthService {
     return this.loggedIn.value;
   }
 
+  public get authorized(): Observable<boolean> {
+    return this.loggedIn;
+  }
+
   public login(username: string, password: string): Observable<void> {
     return this.http
       .post<void>(

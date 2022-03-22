@@ -1,7 +1,8 @@
 {
   "app_title": "Experiments monitor",
   "context_menu": {
-    "logout": "Log out"
+    "logout": "Log out",
+    "notifications": "Push notifications"
   },
   "experiments": {
     "finished": "finished: ",
@@ -32,12 +33,14 @@
     "current_step": "current step:",
     "status": "status:",
     "took": "took: ",
-    "days": "days"
+    "days": "days",
+    "toogle_error_message": "toogle error details"
   },
   "errors": {
     "no_connection": "No connection with server",
     "server_error": "Server error occured",
-    "app_error": "Unknown app error occured"
+    "app_error": "Unknown app error occured",
+    "notifications_error": "Failed to initialize push notifications service"
   },
   "logs": {
     "filters": {

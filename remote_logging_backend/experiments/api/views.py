@@ -14,6 +14,7 @@ from api.serializers import *
 from api.models import *
 from django.http.response import JsonResponse
 from django.contrib import auth
+from api.notifications import send_notification
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(f'{dir_path}/../scrappers')
 User = get_user_model()
@@ -127,23 +128,21 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
         run: ExperimentRun = get_object_or_404(
             ExperimentRun.objects.select_for_update(), pk=pk)
         request_json = request.data
-        config_name: str = list(request_json['configs_execution'].keys())[0]
-        configs_execution: dict = run.configs_execution
-        if configs_execution is None:
-            configs_execution = {}
-        if config_name not in configs_execution:
-            configs_execution[config_name] = {}
-        for key in request_json['configs_execution'][config_name]:
-            configs_execution[config_name][key] = request_json['configs_execution'][config_name][key]
-
-        serializer = ExperimentRunSerializer(
-            run, data=request_json, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse({'message': "updated"}, safe=False, status=status.HTTP_202_ACCEPTED)
-        else:
-            return JsonResponse({'message': "failed"}, safe=False, status=status.HTTP_202_ACCEPTED)
-
+        for value in request_json['configs_execution'].values():
+            if value['has_errors']:
+                run.has_errors = True
+                break
+        run.finished = request_json.get('finished', None)
+        run.finished_configs = request_json.get('finished_configs', run.finished_configs)
+        run.configs_execution = request_json['configs_execution']
+        run.save()
+        if request_json.get('has_errors', False):
+            print('SEND')
+            send_notification(
+                title=f'Error in experiment "{run.experiment.name}"',
+                message=f'Error during experiment execution'
+            )
+        return JsonResponse({'message': "updated"}, safe=False, status=status.HTTP_202_ACCEPTED)
 
 class ExperimentsViewSet(viewsets.ModelViewSet):
 

@@ -34,8 +34,10 @@
       {{ steps.length }}
     </ion-item>
 
-    <ion-list slot="content">
-      <ion-item class="pl2" *ngFor="let step of steps">{{ step }}</ion-item>
+    <ion-list class="p0" slot="content">
+      <ion-item *ngFor="let step of steps">
+        <span class="ml2">{{ step }}</span>
+      </ion-item>
     </ion-list>
   </ion-accordion>
 </ion-accordion-group>
@@ -62,7 +64,7 @@
       </ion-label>
     </ion-item>
 
-    <ion-list slot="content">
+    <ion-list class="p0" slot="content">
       <ion-item *ngFor="let item of configsFinished">
         <ion-label class="pl2">
           <div class="mb1">
@@ -100,7 +102,7 @@
       </ion-label>
     </ion-item>
 
-    <ion-list slot="content">
+    <ion-list class="p0" slot="content">
       <ion-item *ngFor="let item of configsFailed">
         <ion-label class="pl2">
           <div class="mb1">
@@ -128,6 +130,25 @@
               >( {{ item.current_step + 1 }} / {{ steps.length }} )</span
             >
           </div>
+          <div>
+            <ion-button
+              class="mb1"
+              (click)="
+                errorDetailesCollapsedFlags[item.config_name] =
+                  errorDetailesCollapsedFlags[item.config_name] ? false : true
+              "
+              color="light"
+              >{{ "run.toogle_error_message" | translate }}</ion-button
+            >
+            <div *ngIf="errorDetailesCollapsedFlags[item.config_name]">
+              <div class="error-details bold">
+                {{ item.error_message }}
+              </div>
+              <p class="mt1 error-details" *ngIf="item.stack_trace">
+                {{ item.stack_trace }}
+              </p>
+            </div>
+          </div>
         </ion-label>
       </ion-item>
     </ion-list>
@@ -146,7 +167,7 @@
       </ion-label>
     </ion-item>
 
-    <ion-list slot="content">
+    <ion-list class="p0" slot="content">
       <ion-item *ngFor="let item of configsRunning">
         <ion-label class="pl2">
           <div class="mb1">

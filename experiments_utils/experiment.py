@@ -1,13 +1,10 @@
-
-from glob import glob
-from multiprocessing import Lock
 import threading
 from typing import List
 from datetime import datetime
 import logging
 from typing import Any
 from concurrent.futures import ThreadPoolExecutor
-from logging import Logger, getLogger
+from logging import Logger
 from .logging import configure_logging, get_experiment_logger, get_step_logger
 from .remote_logging import RemoteLogsHandler
 from . import settings
@@ -33,12 +30,11 @@ class ExperimentConfig:
     _configs_execution: dict = {}
 
 
-
 def experiment(
     name: str,
     configurations: dict,
     _file_,
-    max_threads: int = 8,
+    max_threads: int = settings.THREADS_LIMIT,
     version: str = None
 ):
     """Decorator for experiment functions
@@ -134,6 +130,7 @@ def experiment(
                 f'Finished whole experiment Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - experiment_start_time}')
             if remote_logs_handler is not None:
                 remote_logs_handler.flush()
+                remote_logs_handler.terminate()
             return
         return wrapper
     return decorator
