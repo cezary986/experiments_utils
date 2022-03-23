@@ -4,6 +4,7 @@
     class="dot"
     [ngClass]="{
       error: failed,
+      killed: killed,
       finished: finished && !failed,
       'never-runned': neverRunned
     }"

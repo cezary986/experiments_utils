@@ -6,6 +6,7 @@ export interface ExperimentRun {
   started: Date;
   finished?: Date;
   has_errors: boolean;
+  killed: boolean;
   finished_configs: number;
   number_of_configs: number;
   configs_execution?: { [config_name: string]: ConfigExecution };

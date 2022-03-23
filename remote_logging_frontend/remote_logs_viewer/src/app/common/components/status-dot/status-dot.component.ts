@@ -6,6 +6,7 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./status-dot.component.scss'],
 })
 export class StatusDotComponent {
+  @Input() killed: boolean;
   @Input() failed: boolean;
   @Input() finished: boolean;
   @Input() neverRunned: boolean;

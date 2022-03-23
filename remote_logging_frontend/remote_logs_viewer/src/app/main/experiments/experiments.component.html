@@ -11,6 +11,7 @@
     <ion-item [button]="true" (click)="onExperimentClick(experiment)">
       <app-status-dot
         class="mr2 block"
+        [killed]="experiment.last_run?.killed"
         [failed]="experiment.last_run?.has_errors"
         [finished]="experiment.last_run?.finished !== undefined && experiment.last_run?.finished !== null"
         [neverRunned]="experiment.last_run === null"

@@ -1,5 +1,5 @@
 <ion-app>
-  <ion-header>
+  <ion-header collapse="fade" [translucent]="true">
     <ion-toolbar color="primary" *ngIf="currentUser | async">
       <ion-buttons *ngIf="navigationService.isNested" slot="start">
         <ion-button (click)="goBack()">
@@ -42,8 +42,17 @@
                 <ion-label class="flex">
                   {{ "context_menu.notifications" | translate }}
                   <span class="spacer"></span>
-                  <ion-icon *ngIf="!notificationsAllowed" class="menu-icon"  name="notifications-off-outline"></ion-icon>
-                  <ion-icon *ngIf="notificationsAllowed" class="menu-icon" color="primary" name="notifications-outline"></ion-icon>
+                  <ion-icon
+                    *ngIf="!notificationsAllowed"
+                    class="menu-icon"
+                    name="notifications-off-outline"
+                  ></ion-icon>
+                  <ion-icon
+                    *ngIf="notificationsAllowed"
+                    class="menu-icon"
+                    color="primary"
+                    name="notifications-outline"
+                  ></ion-icon>
                 </ion-label>
               </ion-item>
               <ion-item
@@ -70,9 +79,6 @@
     </ion-toolbar>
   </ion-header>
   <ion-content>
-    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-      <ion-refresher-content> </ion-refresher-content>
-    </ion-refresher>
     <ion-router-outlet></ion-router-outlet>
   </ion-content>
 </ion-app>

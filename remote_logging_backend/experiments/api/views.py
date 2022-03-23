@@ -1,6 +1,4 @@
 import json
-import logging
-from re import A
 import sys
 import os
 from django.contrib.auth.models import Group
@@ -18,9 +16,18 @@ from django.contrib import auth
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication, BasicAuthentication
 from api.notifications import send_notification
+from api import __version__
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(f'{dir_path}/../scrappers')
 User = get_user_model()
+
+
+class VersionView(APIView):
+
+    authentication_classes = []
+
+    def get(self, request):
+        return JsonResponse({'version': __version__}, status=200)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -80,21 +87,12 @@ class LoginView(APIView):
 class LogoutView(APIView):
 
     authentication_classes = [TokenAuthentication, BasicAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         token, created = Token.objects.get_or_create(user=request.user)
         token.delete()
         auth.logout(request)
         return JsonResponse({'message': 'Logged out'}, status=200)
-
-
-class LoginCheck(APIView):
-
-    authentication_classes = []
-
-    def get(self, request):
-        return JsonResponse({'logged_in': request.user.is_authenticated}, status=200)
 
 
 class ExperimentsRunViewSet(viewsets.ViewSet):
@@ -150,6 +148,7 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
                 run.has_errors = True
                 break
         run.finished = request_json.get('finished', None)
+        run.killed = request_json.get('killed', run.killed)
         run.finished_configs = request_json.get(
             'finished_configs', run.finished_configs)
         run.configs_execution = request_json['configs_execution']
@@ -160,7 +159,7 @@ class ExperimentsRunViewSet(viewsets.ViewSet):
                 title=f'Error in experiment "{run.experiment.name}"',
                 message=f'Error during experiment execution'
             )
-        return JsonResponse({'message': "updated"}, safe=False, status=status.HTTP_202_ACCEPTED)
+        return JsonResponse({'message': "updated"}, safe=False, status=status.HTTP_200_OK)
 
 
 class ExperimentsViewSet(viewsets.ModelViewSet):

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='experiments_utils',
-    version='1.0.0',
+    version='1.1.0',
     author='Cezary Maszczyk',
     author_email='cmaszczyk@polsl.com',
     description='',

@@ -34,8 +34,13 @@
   &.never-runned {
     background-color: var(--gray);
   }
+  
+  &.killed {
+    background-color: rgb(94, 48, 221);
+  }
 }
 
 ion-spinner {
   z-index: 2;
 }
+

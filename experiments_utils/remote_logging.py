@@ -300,3 +300,26 @@ class RemoteLogsHandler(logging.StreamHandler):
         finally:
             if lock.locked():
                 lock.release()
+
+    def _mark_experiment_as_killed(self):
+        try:
+            headers = {'content-type': 'application/json'}
+            url = f'{self.api_url}/api/experiments_runs/{self.run_id}/'
+            payload = {
+                'killed': True,
+                'finished_configs': ExperimentConfig.completed_configs,
+                'configs_execution': ExperimentConfig._configs_execution
+            }
+            payload['finished'] = datetime.now(tz=settings.EXPERIMENT_TIMEZONE).strftime(
+                f'%Y-%m-%d-%H:%M:%S')
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self.logger.error(
+                    f'Failed to save experiment kill info to remote server "{self.api_url}". Server returned {response.status_code} status code and following error:')
+                self.logger.error(response.text)
+        except Exception as error:
+            self.logger.error(
+                f'Failed to save experiment kill info to remote server "{self.api_url}". With following exception:')
+            self.logger.error(str(error))
+            self.logger.error(traceback.format_exc())

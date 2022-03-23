@@ -10,6 +10,7 @@ from .logging import configure_logging, get_experiment_logger, get_step_logger
 from .remote_logging import RemoteLogsHandler
 from . import settings
 import os
+import sys
 import pickle
 import traceback
 
@@ -68,7 +69,7 @@ def experiment(
         tz=settings.EXPERIMENT_TIMEZONE).strftime("%d.%m.%Y_%H.%M.%S")
     logs_dir_name: str = f'{current_time_str}v{version}'
 
-    configure_logging(__file__, logs_dir_name)
+    configure_logging(__file__, logs_dir_name, dir_path)
 
     logger: Logger = get_experiment_logger(name)
     logger.setLevel(logging.DEBUG)
@@ -101,48 +102,60 @@ def experiment(
                     step_name: None for step_name in ExperimentConfig.steps_names}
             for key in configurations:
                 params = configurations[key]
-                context = ExperimentContext(
+                params['context'] = ExperimentContext(
                     config_name=key,
                     current_dir=dir_path
                 )
                 configs_list.append(params)
 
-                def inner_wrapper(experiment_params: dict):
-                    global lock
-                    config_name: str = context.config_name
-                    try:
-                        start_time = datetime.now(
-                            tz=settings.EXPERIMENT_TIMEZONE)
-                        res = function(**experiment_params, context=context, logger=logger)
-                        lock.acquire()
-                        ExperimentConfig.completed_configs = ExperimentConfig.completed_configs + 1
-                        lock.release()
-                        logger.info(
-                            f'Finished experiment for config "{config_name}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}')
-                        if remote_logs_handler is not None:
-                            remote_logs_handler._mark_experiment_as_finished(
-                                config_name)
-                        return res
-                    except Exception as error:
-                        logger.error(
-                            f'Exception during experiment for config: "{config_name}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}, details bellow:')
-                        logger.error(error)
-                        stack_trace = traceback.format_exc()
-                        logger.error(stack_trace)
-                        lock.acquire()
-                        ExperimentConfig.completed_configs = ExperimentConfig.completed_configs + 1
-                        lock.release()
-                        if remote_logs_handler is not None:
-                            remote_logs_handler._mark_experiment_run_as_with_errors(
-                                config_name=config_name,
-                                error_message=str(error),
-                                stack_trace=stack_trace)
+            def inner_wrapper(experiment_params: dict):
+                global lock
+                context: ExperimentContext = experiment_params['context']
+                config_name: str = context.config_name
+
+                try:
+                    start_time = datetime.now(
+                        tz=settings.EXPERIMENT_TIMEZONE)
+                    res = function(**experiment_params, logger=logger)
+                    lock.acquire()
+                    ExperimentConfig.completed_configs = ExperimentConfig.completed_configs + 1
+                    lock.release()
+                    logger.info(
+                        f'Finished experiment for config "{config_name}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}')
+                    if remote_logs_handler is not None:
+                        remote_logs_handler._mark_experiment_as_finished(
+                            config_name)
+                    return res
+                except Exception as error:
+                    logger.error(
+                        f'Exception during experiment for config: "{config_name}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}, details bellow:')
+                    logger.error(error)
+                    stack_trace = traceback.format_exc()
+                    logger.error(stack_trace)
+                    lock.acquire()
+                    ExperimentConfig.completed_configs = ExperimentConfig.completed_configs + 1
+                    lock.release()
+                    if remote_logs_handler is not None:
+                        remote_logs_handler._mark_experiment_run_as_with_errors(
+                            config_name=config_name,
+                            error_message=str(error),
+                            stack_trace=stack_trace)
 
             with ThreadPoolExecutor(max_workers=max_threads) as executor:
-                results = executor.map(inner_wrapper, configs_list)
-                for result in results:
-                    _ = result
-
+                try:
+                    results = executor.map(inner_wrapper, configs_list)
+                    for result in results:
+                        _ = result
+                except KeyboardInterrupt as error:
+                    logger.error(KeyboardInterrupt())
+                    logger.error('Experiment finished with keyboard interrupt')
+                    if remote_logs_handler is not None:
+                        remote_logs_handler.flush()
+                        remote_logs_handler._mark_experiment_as_killed()
+                    # hard kill
+                    while True:
+                        os._exit(1)
+                        sys.exit()
             logger.debug(
                 f'Finished whole experiment Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - experiment_start_time}')
             if remote_logs_handler is not None:

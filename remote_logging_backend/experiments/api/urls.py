@@ -14,9 +14,9 @@ router.register(r'logs/(?P<run_id>.+)', LogEntryViewSet, basename='logs')
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('version', VersionView.as_view(), name='version'),
     path('user', CurrentUserView.as_view(), name='current_user'),
     path('auth/login', LoginView.as_view(), name='login'),
     path('auth/logout', LogoutView.as_view(), name='logout'),
-    path('auth/check_login', LoginCheck.as_view(), name='check_login'),
     path('auth-api/', include('rest_framework.urls', namespace='rest_framework'))
 ]

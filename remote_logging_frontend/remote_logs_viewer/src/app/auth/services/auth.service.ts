@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { map } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { CurrentUserService } from 'src/app/common/services/current-user.service';
 import { Store } from '@ngxs/store';
 import { SetCurrentUser } from 'src/app/store/current_user/store';
 import { NavController } from '@ionic/angular';
+import * as localforage from 'localforage';
 
 @Injectable({
   providedIn: 'root',
@@ -24,14 +25,7 @@ export class AuthService {
     private http: HttpClient,
     private currentUserService: CurrentUserService
   ) {
-    this.checkLoginStatus().subscribe(
-      (res) => {
-        this.fetchCurrentUser();
-      },
-      (error) => {
-        this.logout();
-      }
-    );
+    this.fetchCurrentUser();
   }
 
   private fetchCurrentUser() {
@@ -64,26 +58,38 @@ export class AuthService {
         }
       )
       .pipe(
-        map((res) => {
-          localStorage.setItem(AuthService.TOKEN_KEY, res.token);
-          this.fetchCurrentUser();
-          this.loggedIn.next(true);
-          return res;
+        mergeMap((res) => {
+          const result = new Subject<any>();
+          localforage.setItem(
+            AuthService.TOKEN_KEY,
+            res.token,
+            function (error) {
+              if (error) {
+                result.error(error);
+              } else {
+                this.fetchCurrentUser();
+                this.loggedIn.next(true);
+                result.next(res);
+              }
+              result.complete();
+            }
+          );
+          return result;
         })
       );
   }
 
   public checkLoginStatus(): Observable<boolean> {
-    const status = this.http.get<{ logged_in: boolean }>(
-      `${environment.baseApiUrl}/auth/check_login`,
-      { withCredentials: true }
-    );
-    return status.pipe(
-      map((res) => {
-        this.loggedIn.next(res.logged_in);
-        return res.logged_in;
-      })
-    );
+    const result = new Subject<boolean>();
+    localforage.getItem('key', function (error, token) {
+      if (error) {
+        result.error(error);
+      } else {
+        result.next(token !== null && token !== undefined);
+      }
+      result.complete();
+    });
+    return result;
   }
 
   public logout(): Observable<any> {

@@ -11,8 +11,7 @@ logging_levels = [
 ]
 
 
-def configure_logging(_file_, run_log_dir: str):
-    dir_path = os.path.dirname(os.path.realpath(_file_))
+def configure_logging(_file_, run_log_dir: str, dir_path: str):
     if settings.EXPERIMENT_BASE_LOGGING_DIR is None:
         settings.EXPERIMENT_BASE_LOGGING_DIR = f'{dir_path}/logs/{run_log_dir}'
         print(

@@ -21,6 +21,7 @@
   <app-status-dot
     class="mr2 block"
     [failed]="data.has_errors"
+    [killed]="data.killed"
     [finished]="data.finished !== undefined && data.finished !== null"
     [neverRunned]="false"
   ></app-status-dot>

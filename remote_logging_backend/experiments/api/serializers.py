@@ -39,7 +39,8 @@ class ExperimentSerializer(serializers.HyperlinkedModelSerializer):
                 'finished',
                 'finished_configs',
                 'number_of_configs',
-                'has_errors'
+                'has_errors',
+                'killed',
             ]
 
     last_run = ExperimentRunSimplifiedSerializer(many=False)
@@ -66,6 +67,7 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
             'started',
             'finished',
             'has_errors',
+            'killed',
             'finished_configs',
             'number_of_configs',
             'configs_execution'
