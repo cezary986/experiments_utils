@@ -1,3 +1,4 @@
+from multiprocessing import context
 import threading
 from typing import List
 from datetime import datetime
@@ -30,6 +31,21 @@ class ExperimentConfig:
     _configs_execution: dict = {}
 
 
+class ExperimentContext:
+
+    def __init__(self, config_name: str, current_dir: str) -> None:
+        self._config_name: str = config_name
+        self._current_dir: str = current_dir
+
+    @property
+    def config_name(self) -> str:
+        return self._config_name
+
+    @property
+    def current_dir(self) -> str:
+        return self._current_dir
+
+
 def experiment(
     name: str,
     configurations: dict,
@@ -59,7 +75,7 @@ def experiment(
     ExperimentConfig.main_logger = logger
 
     remote_logs_handler: RemoteLogsHandler = None
-    if settings.REMOTE_LOGGING_URL is not None:
+    if settings.REMOTE_LOGGING_ENABLED:
         remote_logs_handler = RemoteLogsHandler(
             experiment_name=name,
             number_of_configs=len(configurations),
@@ -75,7 +91,6 @@ def experiment(
 
     def decorator(function):
         def wrapper():
-
             ExperimentConfig.steps_names = sorted(ExperimentConfig.steps_names)
             ExperimentConfig.number_of_configs = len(configurations.keys())
             configs_list: list = []
@@ -86,29 +101,31 @@ def experiment(
                     step_name: None for step_name in ExperimentConfig.steps_names}
             for key in configurations:
                 params = configurations[key]
-                params['__dir_path'] = dir_path
-                params['__config_key'] = key
+                context = ExperimentContext(
+                    config_name=key,
+                    current_dir=dir_path
+                )
                 configs_list.append(params)
 
                 def inner_wrapper(experiment_params: dict):
                     global lock
-                    config_name: str = experiment_params['__config_key']
+                    config_name: str = context.config_name
                     try:
                         start_time = datetime.now(
                             tz=settings.EXPERIMENT_TIMEZONE)
-                        res = function(**experiment_params, logger=logger)
+                        res = function(**experiment_params, context=context, logger=logger)
                         lock.acquire()
                         ExperimentConfig.completed_configs = ExperimentConfig.completed_configs + 1
                         lock.release()
                         logger.info(
-                            f'Finished experiment for config "{experiment_params["__config_key"]}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}')
+                            f'Finished experiment for config "{config_name}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}')
                         if remote_logs_handler is not None:
                             remote_logs_handler._mark_experiment_as_finished(
                                 config_name)
                         return res
                     except Exception as error:
                         logger.error(
-                            f'Exception during experiment for config: "{experiment_params["__config_key"]}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}, details bellow:')
+                            f'Exception during experiment for config: "{config_name}". Took: {datetime.now(tz=settings.EXPERIMENT_TIMEZONE) - start_time}, details bellow:')
                         logger.error(error)
                         stack_trace = traceback.format_exc()
                         logger.error(stack_trace)
@@ -142,6 +159,7 @@ def step(name: str):
    """
 
     ExperimentConfig.steps_names.append(name)
+    ExperimentConfig.steps_count += 1
 
     def decorator(function):
 
@@ -150,11 +168,9 @@ def step(name: str):
                 name, ExperimentConfig._last_step_index)
             ExperimentConfig.steps_index[name] = step_index
             ExperimentConfig._last_step_index += 1
-            config_key: str = kwargs['__config_key']
+            config_key: str = kwargs['context'].config_name
 
             logger = get_step_logger(name, config_key)
-            del kwargs['__dir_path']
-            del kwargs['__config_key']
             ExperimentConfig.main_logger.info(
                 f'Started step "{name}" for config "{config_key}"')
             start_time = datetime.now(tz=settings.EXPERIMENT_TIMEZONE)
@@ -162,7 +178,7 @@ def step(name: str):
                 ExperimentConfig.remote_log_handler.log_step(
                     config_key, step_index)
 
-            result = function(*args, **kwargs, logger=logger, _config_name=str)
+            result = function(*args, **kwargs, logger=logger)
 
             now = datetime.now(tz=settings.EXPERIMENT_TIMEZONE)
             ExperimentConfig.steps_completed_times[config_key][name] = now.strftime(
@@ -183,9 +199,9 @@ def step(name: str):
 
 class State(object):
 
-    def __init__(self, **context) -> None:
+    def __init__(self, context: ExperimentContext) -> None:
         object.__setattr__(self, '__variables__', {})
-        params_file_path = f'{context["__dir_path"]}/_cache/{context["__config_key"]}'
+        params_file_path = f'{context.current_dir}/_cache/{context.config_name}'
         object.__setattr__(self, '__params_base_dir_path', params_file_path)
 
     def __getattribute__(self, name: str) -> Any:
