@@ -6,6 +6,7 @@ import { RunsComponent } from './runs.component';
 import { IonicModule } from '@ionic/angular';
 import { StatusDotModule } from 'src/app/common/components/status-dot/status-dot.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { EmptyStateModule } from 'src/app/common/components/empty-state/empty-state.module';
 
 @NgModule({
   declarations: [RunsComponent],
@@ -14,6 +15,7 @@ import { TranslateModule } from '@ngx-translate/core';
     TranslateModule,
     StatusDotModule,
     IonicModule,
+    EmptyStateModule,
     RunsRoutingModule,
   ],
 })

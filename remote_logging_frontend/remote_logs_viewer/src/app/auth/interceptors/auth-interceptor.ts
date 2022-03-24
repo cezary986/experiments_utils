@@ -9,13 +9,13 @@ import {
 import { Observable, Subject } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import * as localforage from 'localforage';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  
   private getToken(): Observable<string> {
     const result = new Subject<string>();
-    localforage.getItem('key', function (error, token: string) {
+    localforage.getItem(AuthService.TOKEN_KEY, (error, token: string) => {
       if (error) {
         result.error(error);
       } else {

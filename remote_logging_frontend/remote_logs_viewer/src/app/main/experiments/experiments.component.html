@@ -1,7 +1,10 @@
+<ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+  <ion-refresher-content></ion-refresher-content>
+</ion-refresher>
 <div *ngIf="!items" class="loader">
   <ion-spinner color="primary"></ion-spinner>
 </div>
-<ion-list *ngIf="items">
+<ion-list *ngIf="items && items?.length > 0">
   <ion-item-sliding *ngFor="let experiment of items">
     <ion-item-options side="start">
       <ion-item-option color="danger" (click)="onRemoveClick(experiment)">
@@ -13,7 +16,10 @@
         class="mr2 block"
         [killed]="experiment.last_run?.killed"
         [failed]="experiment.last_run?.has_errors"
-        [finished]="experiment.last_run?.finished !== undefined && experiment.last_run?.finished !== null"
+        [finished]="
+          experiment.last_run?.finished !== undefined &&
+          experiment.last_run?.finished !== null
+        "
         [neverRunned]="experiment.last_run === null"
       ></app-status-dot>
       <ion-label>
@@ -54,3 +60,10 @@
     </ion-item>
   </ion-item-sliding>
 </ion-list>
+
+<app-empty-state
+  *ngIf="items?.length === 0"
+  [icon]="'flask-outline'"
+  [message]="'experiments.empty' | translate"
+>
+</app-empty-state>

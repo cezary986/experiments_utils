@@ -1,5 +1,4 @@
 [X] Bug while deleting run
-[] broken auth on PWA
-[] interupting with keyboard (and finish in api
-)
-[] 
+[X] broken auth on PWA
+[X] interupting with keyboard (and finish in api)
+[] broken refreshing

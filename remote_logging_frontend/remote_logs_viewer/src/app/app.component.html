@@ -78,7 +78,7 @@
       <ion-title>{{ "app_title" | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-content>
+  <ion-content [scrollEvents]="true">
     <ion-router-outlet></ion-router-outlet>
   </ion-content>
 </ion-app>

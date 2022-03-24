@@ -124,7 +124,7 @@
             <span> {{ item.took.seconds }}s </span>
           </div>
           <div *ngIf="steps" class="finished-configs-info">
-            {{ "run.current_step" | translate }}
+            {{ "run.failed_step" | translate }}
             <strong>{{ steps[item.current_step] }}</strong>
 
             <span class="ml1"

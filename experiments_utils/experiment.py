@@ -25,6 +25,7 @@ class ExperimentConfig:
     steps_count: int = 0
     steps_index: dict = {}
     steps_completed_times: dict = {}
+    current_step: dict = {}
     _last_step_index: int = 0
     completed_configs: int = 0
     number_of_configs: int = 0
@@ -97,9 +98,11 @@ def experiment(
             configs_list: list = []
             experiment_start_time = datetime.now(
                 tz=settings.EXPERIMENT_TIMEZONE)
+            ExperimentConfig.current_step = {}                
             for key in configurations:
                 ExperimentConfig.steps_completed_times[key] = {
                     step_name: None for step_name in ExperimentConfig.steps_names}
+                ExperimentConfig.current_step[key] = 0
             for key in configurations:
                 params = configurations[key]
                 params['context'] = ExperimentContext(
@@ -177,9 +180,6 @@ def step(name: str):
     def decorator(function):
 
         def wrapper(*args, **kwargs):
-            step_index: int = ExperimentConfig.steps_index.get(
-                name, ExperimentConfig._last_step_index)
-            ExperimentConfig.steps_index[name] = step_index
             ExperimentConfig._last_step_index += 1
             config_key: str = kwargs['context'].config_name
 
@@ -188,8 +188,7 @@ def step(name: str):
                 f'Started step "{name}" for config "{config_key}"')
             start_time = datetime.now(tz=settings.EXPERIMENT_TIMEZONE)
             if ExperimentConfig.remote_log_handler is not None:
-                ExperimentConfig.remote_log_handler.log_step(
-                    config_key, step_index)
+                ExperimentConfig.remote_log_handler.log_step(config_key)
 
             result = function(*args, **kwargs, logger=logger)
 
@@ -200,11 +199,9 @@ def step(name: str):
                 f'Finished step "{name}" for config "{config_key}". Took: {now - start_time}')
             logger.debug(
                 f'Finished step "{name}" for config "{config_key}". Took: {now - start_time}')
-
-            step_index += 1
+            ExperimentConfig.current_step[config_key] += 1
             if ExperimentConfig.remote_log_handler is not None:
-                ExperimentConfig.remote_log_handler.log_step(
-                    config_key, step_index)
+                ExperimentConfig.remote_log_handler.log_step(config_key)
             return result
         return wrapper
     return decorator

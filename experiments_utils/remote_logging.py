@@ -182,7 +182,7 @@ class RemoteLogsHandler(logging.StreamHandler):
             if lock.locked():
                 lock.release()
 
-    def log_step(self, config_name: str, current_step_index: int):
+    def log_step(self, config_name: str):
         try:
             headers = {'content-type': 'application/json'}
             url = f'{self.api_url}/api/experiments_runs/{self.run_id}/'
@@ -196,7 +196,7 @@ class RemoteLogsHandler(logging.StreamHandler):
                 **{
                     'config_name': config_name,
                     'steps': ExperimentConfig.steps_names,
-                    'current_step': current_step_index,
+                    'current_step': ExperimentConfig.current_step[config_name],
                     'steps_completed': ExperimentConfig.steps_completed_times[config_name]
                 }
             }

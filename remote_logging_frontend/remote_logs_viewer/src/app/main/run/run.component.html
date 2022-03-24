@@ -25,14 +25,25 @@
       [options]="slideOpts"
     >
       <ion-slide>
+        <ion-refresher slot="fixed" (ionRefresh)="details.refresh($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
         <ion-content [fullscreen]="true">
-          <app-run-details [run]="experimentRun" [active]="currentTab === 0">
+          <app-run-details
+            #details
+            [run]="experimentRun"
+            [active]="currentTab === 0"
+          >
           </app-run-details>
         </ion-content>
       </ion-slide>
       <ion-slide>
+        <ion-refresher slot="fixed" (ionRefresh)="logs.refresh($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
         <ion-content [fullscreen]="true">
           <app-logs
+            #logs
             [runId]="experimentRun.id"
             [active]="currentTab === 1"
           ></app-logs>

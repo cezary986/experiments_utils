@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import {
   AlertController,
   NavController,
@@ -7,12 +7,10 @@ import {
 } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { ExperimentRun } from 'src/app/common/models/experiment-run.model';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentsRunsService } from 'src/app/common/services/experiments-runs.service';
 import { ExperimentsService } from 'src/app/common/services/experiments.service';
-import { RefreshService } from 'src/app/common/services/refresh.service';
 
 @Component({
   selector: 'app-runs',
@@ -32,16 +30,8 @@ export class RunsComponent implements OnDestroy, OnInit {
     public alertController: AlertController,
     private activatedRoute: ActivatedRoute,
     private experimentService: ExperimentsService,
-    private runsService: ExperimentsRunsService,
-    private refreshService: RefreshService
-  ) {
-    this.refreshService
-      .listenToRefresh()
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((event) => {
-        this.refresh(event);
-      });
-  }
+    private runsService: ExperimentsRunsService
+  ) {}
 
   ngOnInit(): void {
     this.experimentId = this.activatedRoute.snapshot.paramMap['params'].id;
@@ -54,10 +44,15 @@ export class RunsComponent implements OnDestroy, OnInit {
   }
 
   private fetchItems(event?) {
-    this.runsService.getRuns(this.experiment.name).subscribe((res) => {
-      this.items = res;
-      event?.complete();
-    });
+    this.runsService.getRuns(this.experiment.name).subscribe(
+      (res) => {
+        this.items = res;
+        event?.target?.complete();
+      },
+      (error) => {
+        event?.target?.complete();
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -66,7 +61,12 @@ export class RunsComponent implements OnDestroy, OnInit {
   }
 
   public onRunClick(run: ExperimentRun) {
-    this.navController.navigateForward(['experiments', this.experiment.id, 'runs', run.id]);
+    this.navController.navigateForward([
+      'experiments',
+      this.experiment.id,
+      'runs',
+      run.id,
+    ]);
   }
 
   public onRemoveClick(run: ExperimentRun) {
@@ -106,7 +106,7 @@ export class RunsComponent implements OnDestroy, OnInit {
   }
 
   public refresh(event?) {
-    this.items = [];
+    this.items = null;
     this.fetchItems(event);
   }
 }

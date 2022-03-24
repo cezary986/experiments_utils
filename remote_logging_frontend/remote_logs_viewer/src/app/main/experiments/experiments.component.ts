@@ -38,10 +38,15 @@ export class ExperimentsComponent implements OnDestroy {
   }
 
   private fetchItems(event?) {
-    this.experimentsService.getExperiments().subscribe((res) => {
-      this.items = res;
-      event?.complete();
-    });
+    this.experimentsService.getExperiments().subscribe(
+      (res) => {
+        this.items = res;
+        event?.target?.complete();
+      },
+      (error) => {
+        event?.target?.complete();
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -96,7 +101,7 @@ export class ExperimentsComponent implements OnDestroy {
   }
 
   public refresh(event?) {
-    this.items = [];
+    this.items = null;
     this.fetchItems(event);
   }
 }

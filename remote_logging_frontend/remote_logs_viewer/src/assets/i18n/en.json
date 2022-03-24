@@ -5,6 +5,7 @@
     "notifications": "Push notifications"
   },
   "experiments": {
+    "empty": "There are no experiments to monitor",
     "finished": "finished: ",
     "started": "started: ",
     "never_run": "never run",
@@ -15,6 +16,7 @@
     "removed": "Experiment \"{{ experimentName }}\" removed"
   },
   "runs": {
+    "empty": "This experiments has no monitored runs",
     "remove_confirm": {
       "title": "Confirm",
       "content": "Are your sure you want to remove logs about this experiment run?"
@@ -31,6 +33,7 @@
     "failed_configs": "failed configs:",
     "running_configs": "running configs:",
     "current_step": "current step:",
+    "failed_step": "failed on step:",
     "status": "status:",
     "took": "took: ",
     "days": "days",

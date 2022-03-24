@@ -1,13 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, Input } from '@angular/core';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import {
   ConfigExecution,
   ExperimentRun,
 } from 'src/app/common/models/experiment-run.model';
 import { ExperimentsRunsService } from 'src/app/common/services/experiments-runs.service';
-import { RefreshService } from 'src/app/common/services/refresh.service';
 
 @Component({
   selector: 'app-run-details',
@@ -25,7 +22,10 @@ export class RunDetailsComponent {
       this.configsRunning = [];
       Object.values(value.configs_execution).forEach(
         (configInfo: ConfigExecution) => {
-          this.steps = configInfo.steps;
+          if (!this.steps) {
+            this.steps = configInfo.steps;
+          }
+
           if (configInfo.finished) {
             configInfo.finished = new Date(configInfo.finished);
 
@@ -62,27 +62,16 @@ export class RunDetailsComponent {
   public steps: string[];
   public errorDetailesCollapsedFlags = {};
 
-  constructor(
-    private translate: TranslateService,
-    private runService: ExperimentsRunsService,
-    private refreshService: RefreshService
-  ) {
-    this.refreshService
-      .listenToRefresh()
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((event) => {
-        this.refresh(event);
-      });
-  }
+  constructor(private runService: ExperimentsRunsService) {}
 
   public refresh(event?) {
     this.runService.getRun(this.data.id).subscribe(
       (res) => {
         this.run = res;
-        event?.complete();
+        event?.target?.complete();
       },
-      (completed) => {
-        event?.completed();
+      (error) => {
+        event?.target?.complete();
       }
     );
   }

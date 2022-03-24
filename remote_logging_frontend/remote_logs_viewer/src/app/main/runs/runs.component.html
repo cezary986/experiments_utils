@@ -1,46 +1,59 @@
-<div *ngIf="!items" class="loader">
-  <ion-spinner color="primary"></ion-spinner>
-</div>
-<ion-list *ngIf="items">
-  <ion-item-sliding *ngFor="let run of items">
-    <ion-item-options side="start">
-      <ion-item-option color="danger" (click)="onRemoveClick(run)">
-        <ion-icon class="menu-icon ml2 mr2" name="trash-outline"></ion-icon>
-      </ion-item-option>
-    </ion-item-options>
-    <ion-item [button]="true" (click)="onRunClick(run)">
-      <app-status-dot
-        class="mr2 block"
-        [failed]="run.has_errors"
-        [killed]="run.killed"
-        [finished]="run.finished !== undefined && run.finished !== null"
-        [neverRunned]="false"
-      ></app-status-dot>
-      <ion-label>
-        <div class="class mb1">
-          <div class="item-wrapper">
-            <span class="mr3">
-              {{ "experiments.started" | translate }}
-              {{ run.started | date: "yyyy.MM.dd HH:mm:ss" }}
-            </span>
-            <span *ngIf="run.finished">
-              {{ "experiments.finished" | translate }}
-              {{ run.finished | date: "yyyy.MM.dd HH:mm:ss" }}
-            </span>
-          </div>
+<ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+  <ion-refresher-content></ion-refresher-content>
+</ion-refresher>
 
-          <div class="flex progress-wrapper mt1">
-            <span class="finished-configs-info mr2">
-              ({{ run.finished_configs }}/{{ run.number_of_configs }})
-            </span>
-            <ion-progress-bar
-              *ngIf="!run.finished"
-              [value]="run.finished_configs / run.number_of_configs"
-              class="progress-bar"
-            ></ion-progress-bar>
+<ion-content>
+  <div *ngIf="!items" class="loader">
+    <ion-spinner color="primary"></ion-spinner>
+  </div>
+  <ion-list *ngIf="items && items.length > 0">
+    <ion-item-sliding *ngFor="let run of items">
+      <ion-item-options side="start">
+        <ion-item-option color="danger" (click)="onRemoveClick(run)">
+          <ion-icon class="menu-icon ml2 mr2" name="trash-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+      <ion-item [button]="true" (click)="onRunClick(run)">
+        <app-status-dot
+          class="mr2 block"
+          [failed]="run.has_errors"
+          [killed]="run.killed"
+          [finished]="run.finished !== undefined && run.finished !== null"
+          [neverRunned]="false"
+        ></app-status-dot>
+        <ion-label>
+          <div class="class mb1">
+            <div class="item-wrapper">
+              <span class="mr3">
+                {{ "experiments.started" | translate }}
+                {{ run.started | date: "yyyy.MM.dd HH:mm:ss" }}
+              </span>
+              <span *ngIf="run.finished">
+                {{ "experiments.finished" | translate }}
+                {{ run.finished | date: "yyyy.MM.dd HH:mm:ss" }}
+              </span>
+            </div>
+
+            <div class="flex progress-wrapper mt1">
+              <span class="finished-configs-info mr2">
+                ({{ run.finished_configs }}/{{ run.number_of_configs }})
+              </span>
+              <ion-progress-bar
+                *ngIf="!run.finished"
+                [value]="run.finished_configs / run.number_of_configs"
+                class="progress-bar"
+              ></ion-progress-bar>
+            </div>
           </div>
-        </div>
-      </ion-label>
-    </ion-item>
-  </ion-item-sliding>
-</ion-list>
+        </ion-label>
+      </ion-item>
+    </ion-item-sliding>
+  </ion-list>
+
+  <app-empty-state
+    *ngIf="items?.length === 0"
+    [icon]="'fitness-outline'"
+    [message]="'runs.empty' | translate"
+  >
+  </app-empty-state>
+</ion-content>

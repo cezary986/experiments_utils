@@ -86,14 +86,16 @@ class LoginView(APIView):
 
 class LogoutView(APIView):
 
-    authentication_classes = [TokenAuthentication, BasicAuthentication]
+    authentication_classes = []
 
     def post(self, request):
-        token, created = Token.objects.get_or_create(user=request.user)
-        token.delete()
-        auth.logout(request)
-        return JsonResponse({'message': 'Logged out'}, status=200)
-
+        if request.user.is_authenticated:
+            token, created = Token.objects.get_or_create(user=request.user)
+            token.delete()
+            auth.logout(request)
+            return JsonResponse({'message': 'Logged out'}, status=200)
+        else:
+            return JsonResponse({'message': 'Already logged out'}, status=200)
 
 class ExperimentsRunViewSet(viewsets.ViewSet):
     pagination_class = None

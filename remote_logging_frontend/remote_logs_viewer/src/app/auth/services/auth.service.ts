@@ -60,20 +60,16 @@ export class AuthService {
       .pipe(
         mergeMap((res) => {
           const result = new Subject<any>();
-          localforage.setItem(
-            AuthService.TOKEN_KEY,
-            res.token,
-            function (error) {
-              if (error) {
-                result.error(error);
-              } else {
-                this.fetchCurrentUser();
-                this.loggedIn.next(true);
-                result.next(res);
-              }
-              result.complete();
+          localforage.setItem(AuthService.TOKEN_KEY, res.token, (error) => {
+            if (error) {
+              result.error(error);
+            } else {
+              this.fetchCurrentUser();
+              this.loggedIn.next(true);
+              result.next(res);
             }
-          );
+            result.complete();
+          });
           return result;
         })
       );
@@ -81,7 +77,7 @@ export class AuthService {
 
   public checkLoginStatus(): Observable<boolean> {
     const result = new Subject<boolean>();
-    localforage.getItem('key', function (error, token) {
+    localforage.getItem('key', (error, token) => {
       if (error) {
         result.error(error);
       } else {

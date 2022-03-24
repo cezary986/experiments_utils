@@ -1,15 +1,18 @@
-import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { NavController, ToastController } from '@ionic/angular';
+import {
+  Component,
+  NgZone,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { IonContent, NavController } from '@ionic/angular';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth/services/auth.service';
 import { User } from './common/models/user.model';
 import { AppBarAction, AppBarService } from './common/services/app-bar.service';
 import { NavigationService } from './common/services/navigation.service';
-import { RefreshService } from './common/services/refresh.service';
 import { CurrentUserState } from './store/current_user/store';
-import { initializeApp, deleteApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { environment } from 'src/environments/environment';
 import { AppError } from './common/errors/app-error';
@@ -22,14 +25,36 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AppComponent implements OnInit {
   @Select(CurrentUserState) currentUser: Observable<User>;
+  @ViewChild(IonContent) content: IonContent;
   public appBarActions: Observable<AppBarAction[]>;
   private firebaseApp: any;
 
   title = 'af-notification';
   message: any = null;
   public notificationsAllowed: boolean = false;
+  private zone: NgZone;
 
-  public requestPermission() {
+  constructor(
+    private translate: TranslateService,
+    private navController: NavController,
+    private appBarService: AppBarService,
+    private authService: AuthService,
+    public navigationService: NavigationService
+  ) {
+    this.appBarActions = this.appBarService.getActions();
+    this.authService.authorized.subscribe((authorized: boolean) => {
+      if (authorized) {
+        this.firebaseApp = initializeApp(environment.firebaseConfig);
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    this.requestNotificationsPermission();
+    this.listenToNotifications();
+  }
+
+  private requestNotificationsPermission() {
     Notification.requestPermission().then((getperm) => {
       if (getperm !== 'denied') {
         this.notificationsAllowed = true;
@@ -55,37 +80,13 @@ export class AppComponent implements OnInit {
       }
     });
   }
-  listen() {
+
+  private listenToNotifications() {
     const messaging = getMessaging();
     onMessage(messaging, (payload) => {
       console.log('Message received. ', payload);
       this.message = payload;
     });
-  }
-
-  constructor(
-    private translate: TranslateService,
-    private navController: NavController,
-    private appBarService: AppBarService,
-    private authService: AuthService,
-    public navigationService: NavigationService,
-    private refreshService: RefreshService
-  ) {
-    this.appBarActions = this.appBarService.getActions();
-    this.authService.authorized.subscribe((authorized: boolean) => {
-      if (authorized) {
-        this.firebaseApp = initializeApp(environment.firebaseConfig);
-      }
-    });
-  }
-
-  ngOnInit(): void {
-    this.requestPermission();
-    this.listen();
-  }
-
-  public doRefresh(event) {
-    this.refreshService.emitRefresh(event.target);
   }
 
   public onLogoutClick() {
@@ -94,5 +95,39 @@ export class AppComponent implements OnInit {
 
   public goBack() {
     this.navController.back();
+  }
+
+  async logScrollEnd($event) {
+    console.log($event);
+
+    if ($event.target.localName != 'ion-content') {
+      // not sure if this is required, just playing it safe
+      return;
+    }
+
+    const scrollElement = await $event.target.getScrollElement();
+    console.log({ scrollElement });
+
+    // minus clientHeight because trigger is scrollTop
+    // otherwise you hit the bottom of the page before
+    // the top screen can get to 80% total document height
+    const scrollHeight =
+      scrollElement.scrollHeight - scrollElement.clientHeight;
+    console.log({ scrollHeight });
+
+    const currentScrollDepth = $event.detail.scrollTop;
+    console.log({ currentScrollDepth });
+
+    const targetPercent = 80;
+
+    let triggerDepth = (scrollHeight / 100) * targetPercent;
+    console.log({ triggerDepth });
+
+    if (currentScrollDepth > triggerDepth) {
+      console.log(`Scrolled to ${targetPercent}%`);
+      // this ensures that the event only triggers once
+
+      // do your analytics tracking here
+    }
   }
 }
