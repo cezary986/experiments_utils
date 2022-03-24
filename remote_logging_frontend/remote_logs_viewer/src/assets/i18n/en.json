@@ -51,6 +51,11 @@
       "all": "show all"
     }
   },
+  "version": {
+    "title": "About app",
+    "app_version": "App version: ",
+    "server_version": "API version: "
+  },
   "yes": "yes",
   "no": "no"
 }

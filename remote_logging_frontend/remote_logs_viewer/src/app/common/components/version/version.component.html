@@ -1,0 +1,24 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>
+      {{ "version.title" | translate }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()"
+        ><ion-icon name="close-outline"></ion-icon
+      ></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-list>
+    <ion-item>
+      <span class="mr2">{{ "version.app_version" | translate }}</span>
+      {{ appVersion }}
+    </ion-item>
+    <ion-item>
+      <span class="mr2">{{ "version.server_version" | translate }}</span>
+      {{ serverVersion }}
+    </ion-item>
+  </ion-list>
+</ion-content>

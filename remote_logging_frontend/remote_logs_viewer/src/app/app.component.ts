@@ -1,5 +1,5 @@
 import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
-import { IonContent, NavController } from '@ionic/angular';
+import { IonContent, ModalController, NavController } from '@ionic/angular';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth/services/auth.service';
@@ -12,6 +12,7 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { environment } from 'src/environments/environment';
 import { AppError } from './common/errors/app-error';
 import { TranslateService } from '@ngx-translate/core';
+import { VersionComponent } from './common/components/version/version.component';
 
 @Component({
   selector: 'app-root',
@@ -23,23 +24,23 @@ export class AppComponent implements OnInit {
   @ViewChild(IonContent) content: IonContent;
   public appBarActions: Observable<AppBarAction[]>;
   private firebaseApp: any;
+  public ve;
 
-  title = 'af-notification';
-  message: any = null;
   public notificationsAllowed: boolean = false;
-  private zone: NgZone;
 
   constructor(
     private translate: TranslateService,
     private navController: NavController,
     private appBarService: AppBarService,
     private authService: AuthService,
-    public navigationService: NavigationService
+    public navigationService: NavigationService,
+    public modalController: ModalController
   ) {
     this.appBarActions = this.appBarService.getActions();
     this.authService.authorized.subscribe((authorized: boolean) => {
       if (authorized) {
         this.firebaseApp = initializeApp(environment.firebaseConfig);
+        this.navController.navigateForward('/experiments');
       }
     });
   }
@@ -80,7 +81,6 @@ export class AppComponent implements OnInit {
     const messaging = getMessaging();
     onMessage(messaging, (payload) => {
       console.log('Message received. ', payload);
-      this.message = payload;
     });
   }
 
@@ -124,5 +124,13 @@ export class AppComponent implements OnInit {
 
       // do your analytics tracking here
     }
+  }
+
+  public async onAboutAppClick() {
+    const modal = await this.modalController.create({
+      component: VersionComponent,
+      cssClass: 'my-custom-class',
+    });
+    return await modal.present();
   }
 }

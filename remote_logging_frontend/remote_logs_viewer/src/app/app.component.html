@@ -56,6 +56,21 @@
                 </ion-label>
               </ion-item>
               <ion-item
+                (click)="onAboutAppClick()"
+                [button]="true"
+                [detail]="false"
+              >
+                <ion-label class="flex">
+                  {{ "version.title" | translate }}
+                  <span class="spacer"></span>
+                  <ion-icon
+                    color="primary"
+                    class="menu-icon"
+                    name="information-circle-outline"
+                  ></ion-icon>
+                </ion-label>
+              </ion-item>
+              <ion-item
                 (click)="onLogoutClick()"
                 [button]="true"
                 [detail]="false"
@@ -78,6 +93,7 @@
       <ion-title>{{ "app_title" | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
+
   <ion-content [scrollEvents]="true">
     <ion-router-outlet></ion-router-outlet>
   </ion-content>

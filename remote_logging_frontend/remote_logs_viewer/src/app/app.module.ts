@@ -20,6 +20,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { CommonErrorHandler } from './common/errors/error-handler';
 import { APP_BASE_HREF } from '@angular/common';
+import { VersionModule } from './common/components/version/version.module';
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(
@@ -37,6 +38,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     HttpClientModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    VersionModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

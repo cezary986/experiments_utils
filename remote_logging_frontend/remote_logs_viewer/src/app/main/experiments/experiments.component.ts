@@ -24,7 +24,9 @@ export class ExperimentsComponent implements OnDestroy {
     private navController: NavController,
     public alertController: AlertController,
     private experimentsService: ExperimentsService
-  ) {}
+  ) {
+    this.fetchItems();
+  }
 
   private fetchItems(event?) {
     this.experimentsService.getExperiments().subscribe(
