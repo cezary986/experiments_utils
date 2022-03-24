@@ -1,9 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentsService } from 'src/app/common/services/experiments.service';
-import { RefreshService } from 'src/app/common/services/refresh.service';
 import {
   AlertController,
   NavController,
@@ -25,17 +23,8 @@ export class ExperimentsComponent implements OnDestroy {
     public toastController: ToastController,
     private navController: NavController,
     public alertController: AlertController,
-    private experimentsService: ExperimentsService,
-    private refreshService: RefreshService
-  ) {
-    this.refreshService
-      .listenToRefresh()
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((event) => {
-        this.refresh(event);
-      });
-    this.fetchItems();
-  }
+    private experimentsService: ExperimentsService
+  ) {}
 
   private fetchItems(event?) {
     this.experimentsService.getExperiments().subscribe(

@@ -1,9 +1,4 @@
-import {
-  Component,
-  NgZone,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import { IonContent, NavController } from '@ionic/angular';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -54,7 +49,7 @@ export class AppComponent implements OnInit {
     this.listenToNotifications();
   }
 
-  private requestNotificationsPermission() {
+  public requestNotificationsPermission() {
     Notification.requestPermission().then((getperm) => {
       if (getperm !== 'denied') {
         this.notificationsAllowed = true;
