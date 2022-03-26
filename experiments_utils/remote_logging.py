@@ -31,7 +31,7 @@ class RemoteLogsHandler(logging.StreamHandler):
             api_url (str): rest api url
         """
         global ExperimentConfig
-        ExperimentConfig = experiment.ExperimentConfig
+        ExperimentConfig = experiment.__ExperimentConfig__
         logging.StreamHandler.__init__(self)
         self.api_url: str = settings.REMOTE_LOGGING_URL
         self.level = logging.DEBUG

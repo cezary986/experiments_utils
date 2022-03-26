@@ -5,7 +5,8 @@ dir_path: str = None
 # Default timezone
 EXPERIMENT_TIMEZONE: str = pytz.timezone('Europe/Warsaw')
 
-EXPERIMENT_BASE_LOGGING_DIR: str = None
+EXPERIMENT_BASE_LOGGING_DIR: str = None # default is './logs'
+EXPERIMENT_CACHE_DIR: str = None # default is './_cache'
 
 THREADS_LIMIT: int = 8
 
