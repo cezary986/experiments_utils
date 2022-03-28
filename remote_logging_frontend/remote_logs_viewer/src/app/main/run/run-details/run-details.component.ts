@@ -27,6 +27,7 @@ export class RunDetailsComponent {
           }
 
           if (configInfo.finished) {
+            configInfo.finishedTimestamp = configInfo.finished as any;
             configInfo.finished = new Date(configInfo.finished);
 
             let took: any =
@@ -49,6 +50,9 @@ export class RunDetailsComponent {
           }
         }
       );
+      this.configsFinished.sort((a, b) => b.finishedTimestamp - a.finishedTimestamp)
+      this.configsFailed.sort((a, b) => b.finishedTimestamp - a.finishedTimestamp)
+      this.configsRunning.sort((a, b) => b.current_step - a.current_step)
     }
   }
   private _active: boolean;

@@ -37,6 +37,9 @@ export class LoginComponent implements OnDestroy {
       }
     };
     document.addEventListener('keyup', this.onEnterListener);
+    setTimeout(() => {
+      this.form.updateValueAndValidity()
+    }, 200)
   }
 
   public onLoginClick() {

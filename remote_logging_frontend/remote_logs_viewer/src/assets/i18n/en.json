@@ -2,7 +2,8 @@
   "app_title": "Experiments monitor",
   "context_menu": {
     "logout": "Log out",
-    "notifications": "Push notifications"
+    "notifications": "Push notifications",
+    "dark_theme": "Dark theme"
   },
   "experiments": {
     "empty": "There are no experiments to monitor",

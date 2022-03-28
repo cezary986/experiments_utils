@@ -1,4 +1,10 @@
-import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  NgZone,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { IonContent, ModalController, NavController } from '@ionic/angular';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -19,12 +25,12 @@ import { VersionComponent } from './common/components/version/version.component'
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   @Select(CurrentUserState) currentUser: Observable<User>;
   @ViewChild(IonContent) content: IonContent;
   public appBarActions: Observable<AppBarAction[]>;
   private firebaseApp: any;
-  public ve;
+  public darkThemeEnabled: boolean;
 
   public notificationsAllowed: boolean = false;
 
@@ -46,8 +52,21 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.navController.navigateRoot(location.pathname);
     this.requestNotificationsPermission();
     this.listenToNotifications();
+  }
+
+  ngAfterViewInit(): void {
+    if (
+      (window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+      document.body.classList.contains('dark')
+    ) {
+      this.darkThemeEnabled = true;
+    } else {
+      this.darkThemeEnabled = false;
+    }
   }
 
   public requestNotificationsPermission() {

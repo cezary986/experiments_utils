@@ -17,6 +17,7 @@ export interface ConfigExecution {
   steps: string[];
   current_step?: number;
   finished?: Date;
+  finishedTimestamp?: number;
   has_errors?: boolean;
   steps_completed?: { [step_name: string]: Date };
   error_message?: string;

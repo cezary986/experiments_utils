@@ -212,9 +212,7 @@ class LogEntryViewSet(viewsets.ViewSet):
         filters = {}
         if 'level' in url_params:
             filters['level_value__gte'] = LOGS_LEVELS[url_params['level']]
-        print(filters)
-        logs = LogEntry.objects.filter(experiment_run__id=run.id, **filters)
-
+        logs = LogEntry.objects.filter(experiment_run__id=run.id, **filters).order_by('-timestamp')
         page = self.paginator.paginate_queryset(logs, request)
         serializer = LogEntrySerializer(
             page, many=True, context={'request': request})
