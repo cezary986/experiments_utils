@@ -135,7 +135,8 @@ class Experiment:
                 f'Starting experiment "{self.name}" v{self.version} (n_paramsets: {len(self.paramsets)})')
             runner.run(experiment=self)
         except KeyboardInterrupt:
-            self._remote_monitor._mark_experiment_as_killed()
+            if self._remote_monitor is not None:
+                self._remote_monitor._mark_experiment_as_killed()
             self._event_emitter.emit_event(ExperimentEndEvent(self.name))
         finally:
             if self._remote_monitor is not None:
