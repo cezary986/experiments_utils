@@ -1,7 +1,0 @@
-{
-  "name": "remote_logs_viewer",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular"
-}

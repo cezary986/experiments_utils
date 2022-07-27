@@ -2,13 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='experiments_utils',
-    version='1.2.0',
+    version='2.0.0',
     author='Cezary Maszczyk',
-    author_email='cmaszczyk@polsl.com',
-    description='',
+    author_email='cezary.maszczyk@gmail.com',
+    description='Microframework to speed up writing scientific experiment code',
     packages=find_packages(),
     install_requires=[
-        'numpy==1.19.5',
-        'pandas==1.2.1',
+        'multiprocess==0.70.13',
     ],
 )

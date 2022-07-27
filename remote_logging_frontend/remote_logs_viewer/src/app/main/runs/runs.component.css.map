@@ -1,9 +1,0 @@
-{
-    "version": 3,
-    "mappings": "AAAA,AAAA,sBAAsB,CAAC;EACrB,SAAS,EAAE,IAAI;EACf,WAAW,EAAE,OAAO;EACpB,OAAO,EAAE,GAAG;CACb;;AAED,AAAA,aAAa,CAAC;EACZ,OAAO,EAAE,IAAI;EACb,SAAS,EAAE,IAAI;CAChB;;AAED,AAAA,iBAAiB,CAAC;EACd,OAAO,EAAE,IAAI;EACb,WAAW,EAAE,MAAM;CACtB",
-    "sources": [
-        "runs.component.scss"
-    ],
-    "names": [],
-    "file": "runs.component.css"
-}
