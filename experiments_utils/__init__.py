@@ -1,3 +1,5 @@
+""".. include:: ../docs_src/main.md
+"""
 from .experiment import experiment, Experiment
 from .step import step, Step
 from .events.event_types import *

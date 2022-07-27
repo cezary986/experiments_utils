@@ -51,7 +51,7 @@ class Step:
             event_type=f'{self.name}__STEP_START'
         ))
         try:
-            self.function(*args, **kwargs)
+            result = self.function(*args, **kwargs)
             event_emitter.emit_event(StepSuccessEvent(
                 self.experiment_name,
                 self.paramset_name,
@@ -104,6 +104,7 @@ class Step:
             self.name,
             event_type=f'{self.name}__STEP_END'
         ))
+        return result
 
     __call__ = run
 
