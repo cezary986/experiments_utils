@@ -1,172 +1,169 @@
 # Experiments utils
 
-Bundle of helpers tools for fast and easy ML experiments writing.
+Microframework to speed up writing scientific experiment code.
 
-Features that comes out of box:
-* fine grained logging
-* caching and reruning only certain part of experiment
-* execution parallelization using threads
+It aims at solving the most popular problems so you can focus on writing your experiment logic.
+Some features that come out of the box are:
+* fine-grained logging
+* caching and rerunning only certain parts of an experiment
+* parallel execution using multiprocessing
 
 ## Experiment
 
-Writing experiment is simply writing a function and decorating it with `experiment` decorator. Complicated experiments could be splitted for steps which are also functions decorated with `step` decorators. 
+Imagine you came up with a great idea for a Machine Learning model and you want to try it out and see how good it is and how it compares to other popular models. You begin by writing a simple code for an experiment. It may look somehow like this:
 
 ```python
-import time
-from experiment import experiment, step
-import math
-from logging import Logger
-from experiments_utils.experiment import *
-from test_config import *
-__version__ = '0.0.1'
 
-CONFIGURATIONS: Dict[str, dict] = {
-    'first': {
-        'a': 1,
-        'b': 2,
-    },
-    'second': {
-        'a': 2,
-        'b': 2
-    }
-}
+def main():
+    df = pd.read_csv('./datasets/iris.csv')
+    y = df['class']
+    X = df.drop('class', 1)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.33)
+    
+    model = MyModel()
+    model.fit(X_train, X_test)
 
-@step('add')
-def add(a: float, b: float, logger: Logger) -> float:
-    logger.info(f'Add a + b = { a + b} (a = {a}, b = {b})')
-    return a + b
+    evaluate_model(model, './my_model_results.csv')
 
-@step('multiply')
-def multiply(a: float, b: float, logger: Logger) -> float:
-    logger.info(f'Multiply a + b = {a * b } (a = {a}, b = {b})')
-    return a * b
+    model = XGBClassifier()
+    model.fit(X_train, X_test)
 
-@step('power')
-def power(a: float, b: float, logger: Logger) -> float:
-    logger.info(f'Power a^b = {math.pow(a, b)} (a = {a}, b = {b})')
-    return math.pow(a, b)
-
-
-@experiment('test', CONFIGURATIONS, __file__, version=__version__)
-def experiment(a: int, b: int, logger: logging.Logger, **context):
-    s = State(**context)
-    s.add_result = add(a, b, **context)
-    s.multiply_result = multiply(a, b, **context)
-    s.power_result = power(a, b, **context)
-    logger.info(f'Result is: {s.power_result}')
+    evaluate_model(model, './xgboost_results.csv')
 
 
 if __name__ == '__main__':
-    experiment()
+    main()
 
 ```
 
-> All experiment variables must be stored in state object. Without it you
-> will loose ability to replay parts of your experiment
+You run it, and get results. Everything is nice but you know such results given only one dataset and one model for comparison is not enough. You need to add more datasets and more models to compare to. It will likely make your experiment run much longer. Depending on datasets it may take hours or days to complete. Running each dataset and model one by one is likely not optimal and some parallelization could improve execution time. Also, you need to remember about error handling so that even if a certain model or dataset will fail you won't lose everything and won't need to rerun from scratch. Also, some logs for possible errors will be useful to know which part of the experiment should be rerun. 
 
-> Experiments are being run using `ThreadPoolExecutor`. Maximum number of threads is 8 by default but
-> could be increased by `exepriment` decorator param `max_threads`.
+Quite a lot of things isn't it? And your nice short and simple code becomes not so simple and not so short. You end up spending time writing errors handling, logging, and parallelization code instead of focusing on what you want to research.
 
-Now lets say your experiment fails on step **multiply** but step **sum** finished successfully. You don't have to rerun whole experiment. You can now fix your code and rerun from exact step that failed before. To do this just comment-out **everything** you don't want to run and leave only part of code you want to replay. Just as simple!
+How this example would look like using `experiments_utils`?
 
 ```python
-@experiment('foo', configurations, __file__)
-def foo(a: int, b: int, c: int, **context):
-    s = State(**context)
-    time.sleep(1)
-    # s.ab = add(a, b, **context)
-    # s.abc = multiply(s.ab, c, **context)
-    s.abcd = divide(s.abc, s.ab, **context)
-    print(s.abcd)
-    ...
-```
-
-Not step `multiply` will be runned with last saved input params. This can saves a lot of time!
-
-## Logging
-
-By default experiments support fine grained logging out of box. Exery experiment and step function has `logger`. You don't have to worry about passing it will be done automagicly.
-
-Example directory sturcture for experiment with configurations:
-
-```python
-CONFIGURATIONS = {
-    'iris': {...},
-    'credit_a': {...},
-    'hepatitis': {...},
-}
-```
-
-and steps:
-
-```python
-@step('preprocess')
-def preprocess(df, logger):
-    ...
-
-@step('train')
-def preprocess(df, logger):
-    ...
-
-@step('test')
-def preprocess(df, logger):
-    ...
-```
-
-Will look like this:
-
-```
-|-logs
-|   |- log.DEBUG.log
-|   |- log.INFO.log
-|   |- log.WARN.log
-|   |- log.ERROR.log
-|   |
-|   |- iris
-|   |   |- preprocess
-|   |   |   |- preprocess.DEBUG.log
-|   |   |   |- preprocess.INFO.log
-|   |   |   |- preprocess.WARN.log
-|   |   |   |- preprocess.ERROR.log
-|   |   |- train
-|   |   |   |- preprocess.DEBUG.log
-|   |   |   |- preprocess.INFO.log
-|   |   |   |- preprocess.WARN.log
-|   |   |   |- preprocess.ERROR.log
-|   |   |- test
-|   |   |   |- preprocess.DEBUG.log
-|   |   |   |- preprocess.INFO.log
-|   |   |   |- preprocess.WARN.log
-|   |   |   |- preprocess.ERROR.log
-|   |- credit_a
-|   |- hepatitis
-```
-
-Such structure allows fine grained logging. If you want to see all logs see _.DEBUG.log file. If you want to see only errors logs go to _.ERROR.log.
-
-## Experiments Preparations
-
-It is good to run experiment starting in order starting from simplest to most complex datasets. You can sort your datasets based on complexity using special helper function. Example bellow:
-
-```python
-import os
+from experiments_utils import experiment
 from glob import glob
-from typing import List
-import pandas as pd
-from experiments_utils.datsets_helpers import sort_dataset_by_complexity
-dir_path = os.path.dirname(os.path.realpath(__file__))
+import os
 
 
-def retrieve_dataset(name: str) -> pd.DataFrame:
-    return pd.read_csv(f'{dir_path}/datasets/{name}/original/{name}.csv')
+MODELS_TO_TRY = [
+    MyModel(),
+    XGBClassifier(),
+    DecisionTreeClassifier(),
+    ...
+]
+
+PARAMSETS = {}
+
+for path in glob('./datasets/'):
+    dataset_name = os.path.basename(path)
+    for model in MODELS_TO_TRY:
+        model_name = model.__class__.__name__
+        PARAMSETS[f'{dataset_name}.{model_name}'] = {
+            'dataset_name': dataset_name,
+            'model_name': model_name,
+            'model': model,
+        }
 
 
-datasets_names: List[str] = list(
-    map(lambda path: os.path.basename(path), glob(f'{dir_path}/datasets/*')))
+@experiment(
+    name='My Experiment',
+    version='1.0.0',
+    paramsets=PARAMSETS,
+)
+def main(
+    dataset_name: str,
+    model_name: str,
+    model,
+):
+    df = pd.read_csv(f'./datasets/{dataset_name}.csv')
+    y = df['class']
+    X = df.drop('class', 1)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.33)
+    
+    model.fit(X_train, X_test)
+    evaluate_model(model, f'./{model_name}__on__{dataset_name}.csv')
 
-sorted_datasets = sort_dataset_by_complexity(
-    datasets_names, dataset_accessor=retrieve_dataset)
-sorted_datasets = list(map(lambda e: e['name'], sorted_datasets))
-import json
-print(json.dumps(sorted_datasets, indent=2))
+
+if __name__ == '__main__':
+    main()
 ```
+
+What has changed? 
+* Experiment function was decorated by `experiment` decorator, given name and version (used for logging).
+* `PARAMSETS` dictionary was generated containing sets of parameters for which your experiment function will run. Keys in this dictionary are used for logging. 
+
+And that's it! Now you can call the `main` function with no params (they will be taken from the `PARAMSETS` dictionary). This will run your function for all given sets of parameters in parallel using multiprocessing. It will automatically produce default logs with execution time and information about certain paramset start and end and possible errors. Not if any of your paramset produce an error you don't need to rerun everything.
+
+But we can do better than this...
+
+Imagine that everything was great but you find some nasty bug in your `MyModel` predict method. It does not affect training performance but your evaluation results of `MyModel` are all wrong. With the code, you have all you can do is rerun the whole training and testing for all datasets for your model. Wouldn't it be nice if you could just run the evaluation part without having to train the model again? We can of course serialize (pickle) model after being trained and later load to skip the training phase but writing this yourself again adds some boilerplate. For such occasions `Store` class exists. Using it we can rewrite our code to something like this:
+
+```python
+...
+from experiments_utils import experiment, Store
+
+...
+
+@experiment(
+    name='My Experiment',
+    version='1.0.0',
+    paramsets=PARAMSETS,
+)
+def main(
+    dataset_name: str,
+    model_name: str,
+    model,
+):
+    s = Store()
+    df = pd.read_csv(f'./datasets/{dataset_name}.csv')
+    y = df['class']
+    X = df.drop('class', 1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    
+    model.fit(X_train, X_test)
+    s.model = model
+    evaluate_model(s.model, f'./{model_name}__on__{dataset_name}.csv')
+
+...
+```
+
+As you can see `Store` object that created and trained the model was assigned to one of its fields. This object works slightly similar to a dictionary. You can put there something and receive it. Assigning to its fields creates a pickle file underhood where the value of this field is stored. All pickles are stored in a special `_cache` directory.
+
+Given this behavior, we can now comment out certain lines of the code and run only those we want to. For example:
+
+```python
+...
+
+...
+
+@experiment(
+    name='My Experiment',
+    version='1.0.0',
+    paramsets=PARAMSETS,
+)
+def main(
+    dataset_name: str,
+    model_name: str,
+    model,
+):
+    s = Store()
+    df = pd.read_csv(f'./datasets/{dataset_name}.csv')
+    y = df['class']
+    X = df.drop('class', 1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    
+    # model.fit(X_train, X_test)
+    # s.model = model
+    evaluate_model(s.model, f'./{model_name}__on__{dataset_name}.csv')
+
+...
+```
+
+Now model training is skipped and the model instance is taken from the `Store` object by reading it from the pickle file from the last known value. Now you can repeat only a minimal amount of code you need. This can save you a lot of time.
+
+

@@ -1,1 +1,0 @@
-python .\manage.py runserver --settings=experiments.dev_settings
