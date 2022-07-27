@@ -1,1 +1,1 @@
-python -m  pdoc --html experiments_utils -o docs
+python -m  pdoc --html experiments_utils -o docs --force
