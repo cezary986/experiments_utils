@@ -18,7 +18,7 @@ def configure_logging(_file_, run_log_dir: str, dir_path: str):
             f'Logs directory not configured, use default logs dir: "{conf.settings.EXPERIMENT_BASE_LOGGING_DIR}"')
     else:
         if conf.settings.EXPERIMENT_BASE_LOGGING_DIR[-1] != '/':
-            conf.settings.EXPERIMENT_BASE_LOGGING_DIR = f'{conf.settings.EXPERIMENT_BASE_LOGGING_DIR}/'
+            conf.settings.EXPERIMENT_BASE_LOGGING_DIR = f'{conf.settings.EXPERIMENT_BASE_LOGGING_DIR}/{run_log_dir}'
         print(
             f'Use configured directory for logs: "{conf.settings.EXPERIMENT_BASE_LOGGING_DIR}"')
     os.makedirs(conf.settings.EXPERIMENT_BASE_LOGGING_DIR, exist_ok=True)
