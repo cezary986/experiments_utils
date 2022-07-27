@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>experiments_utils.remote_logging API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>experiments_utils.remote_logging</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from ast import arg
+from ctypes import Union
+import logging
+import traceback
+from datetime import datetime
+from typing import Any, List, Tuple
+
+from pyrsistent import b
+from .state import ExperimentState, ParamSetState
+from .events.event_types import EventTypes
+from .events import *
+from .context import ExperimentContext
+from . import conf
+from threading import Thread
+from multiprocess.queues import Queue
+from multiprocess import Process
+from multiprocess import Manager
+import requests
+from signal import signal, SIGTERM
+import time
+
+
+def _setup_internal_logger(_settings: Any):
+    logger = logging.getLogger(&#39;remote_logging&#39;)
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(
+        f&#39;{_settings.EXPERIMENT_BASE_LOGGING_DIR}/remote_logging.ERROR.log&#39;)
+    formatter = logging.Formatter(
+        &#39;[%(levelname)s] %(asctime)s %(message)s&#39;)
+    fh.setFormatter(formatter)
+    fh.setLevel(logging.INFO)
+    logging.getLogger(&#34;urllib3&#34;).level = logging.FATAL
+    logging.getLogger(&#34;urllib3&#34;).disabled = True
+    logger.addHandler(fh)
+    logger.propagate = False
+    return logger
+
+
+class RemoteLogsHandler(logging.StreamHandler):
+
+    def __init__(self, logs_queue: Queue) -&gt; None:
+        logging.StreamHandler.__init__(self)
+        self._logger: logging.Logger = _setup_internal_logger(conf.settings)
+        self._logs_queue: Queue = logs_queue
+
+    def format(self, record: logging.LogRecord, **kwargs) -&gt; dict:
+        &#34;&#34;&#34;Format log entry.&#34;&#34;&#34;
+        now = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
+        message = {
+            &#39;timestamp_string&#39;: now.strftime(f&#39;%Y-%m-%dT%H:%M:%S.0Z&#39;),
+            &#39;timestamp&#39;: now.strftime(f&#39;%Y-%m-%d-%H:%M:%S&#39;),
+            &#39;experiment_version&#39;: ExperimentContext.__GLOBAL_CONTEXT__.version,
+            &#39;experiment_name&#39;: ExperimentContext.__GLOBAL_CONTEXT__.name,
+            &#39;logger&#39;: record.name,
+            &#39;config_name&#39;: ExperimentContext.__GLOBAL_CONTEXT__.paramset_name if ExperimentContext.__GLOBAL_CONTEXT__ is not None else None,
+            &#39;filename&#39;: record.filename,
+            &#39;function_name&#39;: record.funcName,
+            &#39;line_number&#39;: record.lineno,
+            &#39;level&#39;: record.levelname,
+            &#39;level_value&#39;: record.levelno,
+        }
+        if isinstance(record.msg, Exception):
+            stack_info = traceback.format_exc()
+            message[&#39;stack_info&#39;] = stack_info
+            message[&#39;message&#39;] = record.msg if isinstance(
+                record.msg, str) else str(record.msg)
+        elif isinstance(record.msg, str):
+            message[&#39;message&#39;] = record.msg
+        else:
+            message[&#39;message&#39;] = str(record.msg)
+        return message
+
+    def emit(self, record: logging.LogRecord, **kwargs):
+        &#34;&#34;&#34;Save log entry to server.&#34;&#34;&#34;
+        try:
+            message = self.format(record, **kwargs)
+            self._logs_queue.put_nowait(message)
+        except Exception as error:
+            error_msg = f&#39;Failed to format logs for remote server &#34;{self.api_url}&#34; with following exception:&#39;
+            self._logger.error(error_msg)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+
+class RemoteExperimentMonitor:
+
+    DEATH_PILL: str = &#39;DEATH_PILL&#39;
+
+    &#34;&#34;&#34;Logging handler writing logs to remote server.&#34;&#34;&#34;
+
+    def __init__(self):
+        from . import settings as settings
+
+        self.api_url: str = settings.REMOTE_LOGGING_URL
+        self._run_id: int = None
+        self._messages_queue: List[logging.LogRecord] = []
+        self._logger: logging.Logger = _setup_internal_logger(conf.settings)
+        self._configs_execution: dict = {}
+        self._experiment_state: ExperimentState = None
+
+        self._logs_queue: Queue = Manager().Queue()
+
+        def run_function(arg: Tuple[Queue, int, Any]):
+            messages_queue: List[logging.LogRecord] = []
+            logs_queue: Queue = arg[0]
+            run_id: int = arg[1]
+            _settings = arg[2]
+            api_url: str = _settings.REMOTE_LOGGING_URL
+            credentials: Tuple[str, str] = _settings.REMOTE_LOGGING_CREDENTIALS
+            logger: logging.Logger = _setup_internal_logger(_settings)
+
+            def on_terminate():
+                RemoteExperimentMonitor._flush(
+                    messages_queue,
+                    logger,
+                    api_url,
+                    run_id,
+                    credentials
+                )
+
+            logger.info(&#39;Log collecting process started&#39;)
+
+            def flush_function():
+                logger.info(&#39;Flush thread started&#39;)
+                while True:
+                    time.sleep(settings.REMOTE_LOGGING_THROTTLE)
+                    RemoteExperimentMonitor._flush(
+                        messages_queue,
+                        logger,
+                        api_url,
+                        run_id,
+                        credentials
+                    )
+            flush_thread = Thread(target=flush_function, daemon=True)
+            flush_thread.start()
+            while True:
+                record: Union[logging.LogRecord, str] = logs_queue.get()
+                if record == RemoteExperimentMonitor.DEATH_PILL:
+                    on_terminate()
+                    return
+                else:
+                    messages_queue.append(record)
+
+        self._fetch_run_id()
+        self._process: Process = Process(
+            target=run_function, args=[(
+                self._logs_queue,
+                self._run_id,
+                conf.settings
+            )])
+
+    @property
+    def logs_queue(self) -&gt; Queue:
+        return self._logs_queue
+
+    def bootstrap(self, experiment):
+        self._experiment_state: ExperimentState = experiment.state
+
+        @experiment.on_event(EventTypes.EXPERIMENT_START)
+        def _(event: ExperimentStartEvent):
+            self._create_experiment()
+
+        @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_SUCCESS)
+        def _(event: ParamsetEndEvent):
+            self._mark_experiment_as_finished(
+                paramset_name=event.paramset_name)
+
+        @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_ERROR)
+        def _(event: ParamsetErrorEvent):
+            self._mark_experiment_run_as_with_errors(
+                paramset_name=event.paramset_name,
+                error_message=str(event.exception),
+                stack_trace=event.stack_trace
+            )
+
+        @experiment.on_event(EventTypes.STEP_END)
+        def _(event: StepEndEvent):
+            self._log_step(
+                config_name=event.paramset_name
+            )
+
+    def run(self):
+        self._process.start()
+
+    def terminate(self):
+        self.logs_queue.put_nowait(RemoteExperimentMonitor.DEATH_PILL)
+        self._logger.info(&#39;Log collecting process terminated&#39;)
+
+    @staticmethod
+    def _flush(
+        messages_queue: List[logging.LogRecord],
+        logger: logging.Logger,
+        api_url: str,
+        run_id: int,
+        credentials: Tuple[str, str]
+    ):
+        if len(messages_queue) == 0:
+            return
+        headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+        url = f&#39;{api_url}/api/logs/{run_id}/&#39;
+        response = requests.post(
+            url, json=messages_queue, headers=headers, auth=credentials)
+        messages_queue.clear()
+        if response.status_code != 200:
+            logger.error(
+                f&#39;Failed to save logs to remote server &#34;{api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+            logger.error(response.text)
+        logger.info(&#39;Flushed&#39;)
+
+    def _create_experiment(self):
+        &#34;&#34;&#34;Create experiment on server (or does nothing if already exists).&#34;&#34;&#34;
+        url = f&#39;{self.api_url}/api/experiments/&#39;
+        payload = {&#34;name&#34;: ExperimentContext.__GLOBAL_CONTEXT__.name}
+        headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+        try:
+            response = requests.post(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+
+            if response.status_code != 200 or (response.status_code == 400 and (&#39;already exists&#39; in response.text)):
+                return
+            else:
+                self._logger.error(
+                    f&#39;Failed to create new experiment on remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to create new experiment on remote server &#34;{self.api_url}&#34; with following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _fetch_run_id(self):
+        &#34;&#34;&#34;Save log entry to server.&#34;&#34;&#34;
+        self._create_experiment()
+        url = f&#39;{self.api_url}/api/experiments_runs/&#39;
+        payload = {
+            &#34;experiment_name&#34;: ExperimentContext.__GLOBAL_CONTEXT__.name,
+            &#34;number_of_configs&#34;: len(ExperimentContext.__GLOBAL_CONTEXT__.paramsets_names)
+        }
+        headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+        try:
+            response = requests.post(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to create new experiment run on remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+            else:
+                self._run_id = response.json()[&#39;run_id&#39;]
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to create new experiment run on remote server &#34;{self.api_url}&#34; with following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _log_step(self, config_name: str):
+        try:
+            paramset_state: ParamSetState = self._experiment_state.get_paramset_state(
+                config_name)
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+            if config_name not in self._configs_execution:
+                self._configs_execution[config_name] = {
+                    &#39;has_errors&#39;: False,
+                }
+            steps_completed = {}
+            for step_name in self._experiment_state.steps_names:
+                if paramset_state._steps_state[step_name].finished is not None:
+                    steps_completed[step_name] = paramset_state._steps_state[step_name].finished.strftime(
+                        f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            self._configs_execution[config_name] = {
+                **self._configs_execution[config_name],
+                **{
+                    &#39;config_name&#39;: config_name,
+                    &#39;steps&#39;: self._experiment_state.steps_names,
+                    &#39;current_step&#39;: paramset_state.current_step,
+                    &#39;steps_completed&#39;: steps_completed
+                }
+            }
+            payload = {
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save step log to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save step log to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _mark_experiment_run_as_with_errors(self, paramset_name: str, error_message: str, stack_trace: str = None):
+        try:
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+            if paramset_name not in self._configs_execution:
+                self._configs_execution[paramset_name] = {}
+            self._configs_execution[paramset_name] = {
+                **self._configs_execution[paramset_name],
+                **{
+                    &#39;config_name&#39;: paramset_name,
+                    &#39;steps&#39;: self._experiment_state.steps_names,
+                    &#39;has_errors&#39;: True,
+                    &#39;finished&#39;: datetime.timestamp(datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)) * 1000,
+                    &#39;error_message&#39;: error_message,
+                    &#39;stack_trace&#39;: stack_trace
+                }
+            }
+            finished_paramsets: int = len(
+                self._experiment_state.finished_paramsets) + len(self._experiment_state.failed_paramsets)
+            payload = {
+                &#39;has_errors&#39;: True,
+                &#39;finished_configs&#39;: finished_paramsets,
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            if finished_paramsets == len(self._experiment_state.paramsets_names):
+                payload[&#39;finished&#39;] = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE).strftime(
+                    f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save experiment run error info to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save experiment run error info to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _mark_experiment_as_finished(self, paramset_name: str):
+        try:
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+
+            self._configs_execution[paramset_name] = {
+                **self._configs_execution[paramset_name],
+                **{
+                    &#39;config_name&#39;: paramset_name,
+                    &#39;steps&#39;: self._experiment_state.steps_names,
+                    &#39;has_errors&#39;: False,
+                    &#39;finished&#39;: datetime.timestamp(datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)) * 1000,
+                }
+            }
+            finished_paramsets: int = len(
+                self._experiment_state.finished_paramsets) + len(self._experiment_state.failed_paramsets)
+            payload = {
+                &#39;finished_configs&#39;: finished_paramsets,
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            if finished_paramsets == len(self._experiment_state.paramsets_names):
+                payload[&#39;finished&#39;] = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE).strftime(
+                    f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save experiment finished info to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save experiment finished info to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _mark_experiment_as_killed(self):
+        try:
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+            finished_paramsets: int = len(
+                self._experiment_state.finished_paramsets) + len(self._experiment_state.failed_paramsets)
+            payload = {
+                &#39;killed&#39;: True,
+                &#39;finished_configs&#39;: finished_paramsets,
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            payload[&#39;finished&#39;] = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE).strftime(
+                f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save experiment kill info to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save experiment kill info to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="experiments_utils.remote_logging.RemoteExperimentMonitor"><code class="flex name class">
+<span>class <span class="ident">RemoteExperimentMonitor</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RemoteExperimentMonitor:
+
+    DEATH_PILL: str = &#39;DEATH_PILL&#39;
+
+    &#34;&#34;&#34;Logging handler writing logs to remote server.&#34;&#34;&#34;
+
+    def __init__(self):
+        from . import settings as settings
+
+        self.api_url: str = settings.REMOTE_LOGGING_URL
+        self._run_id: int = None
+        self._messages_queue: List[logging.LogRecord] = []
+        self._logger: logging.Logger = _setup_internal_logger(conf.settings)
+        self._configs_execution: dict = {}
+        self._experiment_state: ExperimentState = None
+
+        self._logs_queue: Queue = Manager().Queue()
+
+        def run_function(arg: Tuple[Queue, int, Any]):
+            messages_queue: List[logging.LogRecord] = []
+            logs_queue: Queue = arg[0]
+            run_id: int = arg[1]
+            _settings = arg[2]
+            api_url: str = _settings.REMOTE_LOGGING_URL
+            credentials: Tuple[str, str] = _settings.REMOTE_LOGGING_CREDENTIALS
+            logger: logging.Logger = _setup_internal_logger(_settings)
+
+            def on_terminate():
+                RemoteExperimentMonitor._flush(
+                    messages_queue,
+                    logger,
+                    api_url,
+                    run_id,
+                    credentials
+                )
+
+            logger.info(&#39;Log collecting process started&#39;)
+
+            def flush_function():
+                logger.info(&#39;Flush thread started&#39;)
+                while True:
+                    time.sleep(settings.REMOTE_LOGGING_THROTTLE)
+                    RemoteExperimentMonitor._flush(
+                        messages_queue,
+                        logger,
+                        api_url,
+                        run_id,
+                        credentials
+                    )
+            flush_thread = Thread(target=flush_function, daemon=True)
+            flush_thread.start()
+            while True:
+                record: Union[logging.LogRecord, str] = logs_queue.get()
+                if record == RemoteExperimentMonitor.DEATH_PILL:
+                    on_terminate()
+                    return
+                else:
+                    messages_queue.append(record)
+
+        self._fetch_run_id()
+        self._process: Process = Process(
+            target=run_function, args=[(
+                self._logs_queue,
+                self._run_id,
+                conf.settings
+            )])
+
+    @property
+    def logs_queue(self) -&gt; Queue:
+        return self._logs_queue
+
+    def bootstrap(self, experiment):
+        self._experiment_state: ExperimentState = experiment.state
+
+        @experiment.on_event(EventTypes.EXPERIMENT_START)
+        def _(event: ExperimentStartEvent):
+            self._create_experiment()
+
+        @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_SUCCESS)
+        def _(event: ParamsetEndEvent):
+            self._mark_experiment_as_finished(
+                paramset_name=event.paramset_name)
+
+        @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_ERROR)
+        def _(event: ParamsetErrorEvent):
+            self._mark_experiment_run_as_with_errors(
+                paramset_name=event.paramset_name,
+                error_message=str(event.exception),
+                stack_trace=event.stack_trace
+            )
+
+        @experiment.on_event(EventTypes.STEP_END)
+        def _(event: StepEndEvent):
+            self._log_step(
+                config_name=event.paramset_name
+            )
+
+    def run(self):
+        self._process.start()
+
+    def terminate(self):
+        self.logs_queue.put_nowait(RemoteExperimentMonitor.DEATH_PILL)
+        self._logger.info(&#39;Log collecting process terminated&#39;)
+
+    @staticmethod
+    def _flush(
+        messages_queue: List[logging.LogRecord],
+        logger: logging.Logger,
+        api_url: str,
+        run_id: int,
+        credentials: Tuple[str, str]
+    ):
+        if len(messages_queue) == 0:
+            return
+        headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+        url = f&#39;{api_url}/api/logs/{run_id}/&#39;
+        response = requests.post(
+            url, json=messages_queue, headers=headers, auth=credentials)
+        messages_queue.clear()
+        if response.status_code != 200:
+            logger.error(
+                f&#39;Failed to save logs to remote server &#34;{api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+            logger.error(response.text)
+        logger.info(&#39;Flushed&#39;)
+
+    def _create_experiment(self):
+        &#34;&#34;&#34;Create experiment on server (or does nothing if already exists).&#34;&#34;&#34;
+        url = f&#39;{self.api_url}/api/experiments/&#39;
+        payload = {&#34;name&#34;: ExperimentContext.__GLOBAL_CONTEXT__.name}
+        headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+        try:
+            response = requests.post(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+
+            if response.status_code != 200 or (response.status_code == 400 and (&#39;already exists&#39; in response.text)):
+                return
+            else:
+                self._logger.error(
+                    f&#39;Failed to create new experiment on remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to create new experiment on remote server &#34;{self.api_url}&#34; with following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _fetch_run_id(self):
+        &#34;&#34;&#34;Save log entry to server.&#34;&#34;&#34;
+        self._create_experiment()
+        url = f&#39;{self.api_url}/api/experiments_runs/&#39;
+        payload = {
+            &#34;experiment_name&#34;: ExperimentContext.__GLOBAL_CONTEXT__.name,
+            &#34;number_of_configs&#34;: len(ExperimentContext.__GLOBAL_CONTEXT__.paramsets_names)
+        }
+        headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+        try:
+            response = requests.post(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to create new experiment run on remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+            else:
+                self._run_id = response.json()[&#39;run_id&#39;]
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to create new experiment run on remote server &#34;{self.api_url}&#34; with following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _log_step(self, config_name: str):
+        try:
+            paramset_state: ParamSetState = self._experiment_state.get_paramset_state(
+                config_name)
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+            if config_name not in self._configs_execution:
+                self._configs_execution[config_name] = {
+                    &#39;has_errors&#39;: False,
+                }
+            steps_completed = {}
+            for step_name in self._experiment_state.steps_names:
+                if paramset_state._steps_state[step_name].finished is not None:
+                    steps_completed[step_name] = paramset_state._steps_state[step_name].finished.strftime(
+                        f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            self._configs_execution[config_name] = {
+                **self._configs_execution[config_name],
+                **{
+                    &#39;config_name&#39;: config_name,
+                    &#39;steps&#39;: self._experiment_state.steps_names,
+                    &#39;current_step&#39;: paramset_state.current_step,
+                    &#39;steps_completed&#39;: steps_completed
+                }
+            }
+            payload = {
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save step log to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save step log to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _mark_experiment_run_as_with_errors(self, paramset_name: str, error_message: str, stack_trace: str = None):
+        try:
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+            if paramset_name not in self._configs_execution:
+                self._configs_execution[paramset_name] = {}
+            self._configs_execution[paramset_name] = {
+                **self._configs_execution[paramset_name],
+                **{
+                    &#39;config_name&#39;: paramset_name,
+                    &#39;steps&#39;: self._experiment_state.steps_names,
+                    &#39;has_errors&#39;: True,
+                    &#39;finished&#39;: datetime.timestamp(datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)) * 1000,
+                    &#39;error_message&#39;: error_message,
+                    &#39;stack_trace&#39;: stack_trace
+                }
+            }
+            finished_paramsets: int = len(
+                self._experiment_state.finished_paramsets) + len(self._experiment_state.failed_paramsets)
+            payload = {
+                &#39;has_errors&#39;: True,
+                &#39;finished_configs&#39;: finished_paramsets,
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            if finished_paramsets == len(self._experiment_state.paramsets_names):
+                payload[&#39;finished&#39;] = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE).strftime(
+                    f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save experiment run error info to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save experiment run error info to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _mark_experiment_as_finished(self, paramset_name: str):
+        try:
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+
+            self._configs_execution[paramset_name] = {
+                **self._configs_execution[paramset_name],
+                **{
+                    &#39;config_name&#39;: paramset_name,
+                    &#39;steps&#39;: self._experiment_state.steps_names,
+                    &#39;has_errors&#39;: False,
+                    &#39;finished&#39;: datetime.timestamp(datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)) * 1000,
+                }
+            }
+            finished_paramsets: int = len(
+                self._experiment_state.finished_paramsets) + len(self._experiment_state.failed_paramsets)
+            payload = {
+                &#39;finished_configs&#39;: finished_paramsets,
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            if finished_paramsets == len(self._experiment_state.paramsets_names):
+                payload[&#39;finished&#39;] = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE).strftime(
+                    f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save experiment finished info to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save experiment finished info to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+
+    def _mark_experiment_as_killed(self):
+        try:
+            headers = {&#39;content-type&#39;: &#39;application/json&#39;}
+            url = f&#39;{self.api_url}/api/experiments_runs/{self._run_id}/&#39;
+            finished_paramsets: int = len(
+                self._experiment_state.finished_paramsets) + len(self._experiment_state.failed_paramsets)
+            payload = {
+                &#39;killed&#39;: True,
+                &#39;finished_configs&#39;: finished_paramsets,
+                &#39;configs_execution&#39;: self._configs_execution
+            }
+            payload[&#39;finished&#39;] = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE).strftime(
+                f&#39;%Y-%m-%d-%H:%M:%S&#39;)
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f&#39;Failed to save experiment kill info to remote server &#34;{self.api_url}&#34;. Server returned {response.status_code} status code and following error:&#39;)
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f&#39;Failed to save experiment kill info to remote server &#34;{self.api_url}&#34;. With following exception:&#39;)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="experiments_utils.remote_logging.RemoteExperimentMonitor.DEATH_PILL"><code class="name">var <span class="ident">DEATH_PILL</span> : str</code></dt>
+<dd>
+<div class="desc"><p>Logging handler writing logs to remote server.</p></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="experiments_utils.remote_logging.RemoteExperimentMonitor.logs_queue"><code class="name">var <span class="ident">logs_queue</span> : multiprocess.queues.Queue</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def logs_queue(self) -&gt; Queue:
+    return self._logs_queue</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="experiments_utils.remote_logging.RemoteExperimentMonitor.bootstrap"><code class="name flex">
+<span>def <span class="ident">bootstrap</span></span>(<span>self, experiment)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bootstrap(self, experiment):
+    self._experiment_state: ExperimentState = experiment.state
+
+    @experiment.on_event(EventTypes.EXPERIMENT_START)
+    def _(event: ExperimentStartEvent):
+        self._create_experiment()
+
+    @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_SUCCESS)
+    def _(event: ParamsetEndEvent):
+        self._mark_experiment_as_finished(
+            paramset_name=event.paramset_name)
+
+    @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_ERROR)
+    def _(event: ParamsetErrorEvent):
+        self._mark_experiment_run_as_with_errors(
+            paramset_name=event.paramset_name,
+            error_message=str(event.exception),
+            stack_trace=event.stack_trace
+        )
+
+    @experiment.on_event(EventTypes.STEP_END)
+    def _(event: StepEndEvent):
+        self._log_step(
+            config_name=event.paramset_name
+        )</code></pre>
+</details>
+</dd>
+<dt id="experiments_utils.remote_logging.RemoteExperimentMonitor.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run(self):
+    self._process.start()</code></pre>
+</details>
+</dd>
+<dt id="experiments_utils.remote_logging.RemoteExperimentMonitor.terminate"><code class="name flex">
+<span>def <span class="ident">terminate</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def terminate(self):
+    self.logs_queue.put_nowait(RemoteExperimentMonitor.DEATH_PILL)
+    self._logger.info(&#39;Log collecting process terminated&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="experiments_utils.remote_logging.RemoteLogsHandler"><code class="flex name class">
+<span>class <span class="ident">RemoteLogsHandler</span></span>
+<span>(</span><span>logs_queue: multiprocess.queues.Queue)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A handler class which writes logging records, appropriately formatted,
+to a stream. Note that this class does not close the stream, as
+sys.stdout or sys.stderr may be used.</p>
+<p>Initialize the handler.</p>
+<p>If stream is not specified, sys.stderr is used.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RemoteLogsHandler(logging.StreamHandler):
+
+    def __init__(self, logs_queue: Queue) -&gt; None:
+        logging.StreamHandler.__init__(self)
+        self._logger: logging.Logger = _setup_internal_logger(conf.settings)
+        self._logs_queue: Queue = logs_queue
+
+    def format(self, record: logging.LogRecord, **kwargs) -&gt; dict:
+        &#34;&#34;&#34;Format log entry.&#34;&#34;&#34;
+        now = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
+        message = {
+            &#39;timestamp_string&#39;: now.strftime(f&#39;%Y-%m-%dT%H:%M:%S.0Z&#39;),
+            &#39;timestamp&#39;: now.strftime(f&#39;%Y-%m-%d-%H:%M:%S&#39;),
+            &#39;experiment_version&#39;: ExperimentContext.__GLOBAL_CONTEXT__.version,
+            &#39;experiment_name&#39;: ExperimentContext.__GLOBAL_CONTEXT__.name,
+            &#39;logger&#39;: record.name,
+            &#39;config_name&#39;: ExperimentContext.__GLOBAL_CONTEXT__.paramset_name if ExperimentContext.__GLOBAL_CONTEXT__ is not None else None,
+            &#39;filename&#39;: record.filename,
+            &#39;function_name&#39;: record.funcName,
+            &#39;line_number&#39;: record.lineno,
+            &#39;level&#39;: record.levelname,
+            &#39;level_value&#39;: record.levelno,
+        }
+        if isinstance(record.msg, Exception):
+            stack_info = traceback.format_exc()
+            message[&#39;stack_info&#39;] = stack_info
+            message[&#39;message&#39;] = record.msg if isinstance(
+                record.msg, str) else str(record.msg)
+        elif isinstance(record.msg, str):
+            message[&#39;message&#39;] = record.msg
+        else:
+            message[&#39;message&#39;] = str(record.msg)
+        return message
+
+    def emit(self, record: logging.LogRecord, **kwargs):
+        &#34;&#34;&#34;Save log entry to server.&#34;&#34;&#34;
+        try:
+            message = self.format(record, **kwargs)
+            self._logs_queue.put_nowait(message)
+        except Exception as error:
+            error_msg = f&#39;Failed to format logs for remote server &#34;{self.api_url}&#34; with following exception:&#39;
+            self._logger.error(error_msg)
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>logging.StreamHandler</li>
+<li>logging.Handler</li>
+<li>logging.Filterer</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="experiments_utils.remote_logging.RemoteLogsHandler.emit"><code class="name flex">
+<span>def <span class="ident">emit</span></span>(<span>self, record: logging.LogRecord, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save log entry to server.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def emit(self, record: logging.LogRecord, **kwargs):
+    &#34;&#34;&#34;Save log entry to server.&#34;&#34;&#34;
+    try:
+        message = self.format(record, **kwargs)
+        self._logs_queue.put_nowait(message)
+    except Exception as error:
+        error_msg = f&#39;Failed to format logs for remote server &#34;{self.api_url}&#34; with following exception:&#39;
+        self._logger.error(error_msg)
+        self._logger.error(str(error))
+        self._logger.error(traceback.format_exc())</code></pre>
+</details>
+</dd>
+<dt id="experiments_utils.remote_logging.RemoteLogsHandler.format"><code class="name flex">
+<span>def <span class="ident">format</span></span>(<span>self, record: logging.LogRecord, **kwargs) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Format log entry.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def format(self, record: logging.LogRecord, **kwargs) -&gt; dict:
+    &#34;&#34;&#34;Format log entry.&#34;&#34;&#34;
+    now = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
+    message = {
+        &#39;timestamp_string&#39;: now.strftime(f&#39;%Y-%m-%dT%H:%M:%S.0Z&#39;),
+        &#39;timestamp&#39;: now.strftime(f&#39;%Y-%m-%d-%H:%M:%S&#39;),
+        &#39;experiment_version&#39;: ExperimentContext.__GLOBAL_CONTEXT__.version,
+        &#39;experiment_name&#39;: ExperimentContext.__GLOBAL_CONTEXT__.name,
+        &#39;logger&#39;: record.name,
+        &#39;config_name&#39;: ExperimentContext.__GLOBAL_CONTEXT__.paramset_name if ExperimentContext.__GLOBAL_CONTEXT__ is not None else None,
+        &#39;filename&#39;: record.filename,
+        &#39;function_name&#39;: record.funcName,
+        &#39;line_number&#39;: record.lineno,
+        &#39;level&#39;: record.levelname,
+        &#39;level_value&#39;: record.levelno,
+    }
+    if isinstance(record.msg, Exception):
+        stack_info = traceback.format_exc()
+        message[&#39;stack_info&#39;] = stack_info
+        message[&#39;message&#39;] = record.msg if isinstance(
+            record.msg, str) else str(record.msg)
+    elif isinstance(record.msg, str):
+        message[&#39;message&#39;] = record.msg
+    else:
+        message[&#39;message&#39;] = str(record.msg)
+    return message</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="experiments_utils" href="index.html">experiments_utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="experiments_utils.remote_logging.RemoteExperimentMonitor" href="#experiments_utils.remote_logging.RemoteExperimentMonitor">RemoteExperimentMonitor</a></code></h4>
+<ul class="">
+<li><code><a title="experiments_utils.remote_logging.RemoteExperimentMonitor.DEATH_PILL" href="#experiments_utils.remote_logging.RemoteExperimentMonitor.DEATH_PILL">DEATH_PILL</a></code></li>
+<li><code><a title="experiments_utils.remote_logging.RemoteExperimentMonitor.bootstrap" href="#experiments_utils.remote_logging.RemoteExperimentMonitor.bootstrap">bootstrap</a></code></li>
+<li><code><a title="experiments_utils.remote_logging.RemoteExperimentMonitor.logs_queue" href="#experiments_utils.remote_logging.RemoteExperimentMonitor.logs_queue">logs_queue</a></code></li>
+<li><code><a title="experiments_utils.remote_logging.RemoteExperimentMonitor.run" href="#experiments_utils.remote_logging.RemoteExperimentMonitor.run">run</a></code></li>
+<li><code><a title="experiments_utils.remote_logging.RemoteExperimentMonitor.terminate" href="#experiments_utils.remote_logging.RemoteExperimentMonitor.terminate">terminate</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="experiments_utils.remote_logging.RemoteLogsHandler" href="#experiments_utils.remote_logging.RemoteLogsHandler">RemoteLogsHandler</a></code></h4>
+<ul class="">
+<li><code><a title="experiments_utils.remote_logging.RemoteLogsHandler.emit" href="#experiments_utils.remote_logging.RemoteLogsHandler.emit">emit</a></code></li>
+<li><code><a title="experiments_utils.remote_logging.RemoteLogsHandler.format" href="#experiments_utils.remote_logging.RemoteLogsHandler.format">format</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

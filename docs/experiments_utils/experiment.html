@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>experiments_utils.experiment API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>experiments_utils.experiment</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from __future__ import annotations
+from logging import Logger
+import logging
+from time import sleep
+from typing import Any, Callable, Dict
+import os
+from datetime import datetime
+from .logs import configure_experiment_logger, configure_logging
+from . import conf
+from .events.emitter import EventEmitter
+from .events.handler import EventHandler
+from .events import EventTypes
+from .events.events import *
+from .runner import Runner
+from .store import Store
+from .remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
+from .state import ExperimentStateManager, ExperimentState
+from .context import ExperimentContext
+import inspect
+from multiprocess import Manager
+from multiprocess.queues import Queue
+
+
+class Experiment:
+    &#34;&#34;&#34;Wrapping class for experiment function.
+    It allows:
+        * running experimen function with multiple sets of parameters on multiple processes
+        * accessing basic experiment info like name or version
+        * accessing experiment logger
+        * listening to different experiment events - to see
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        function,
+        name: str,
+        paramsets: Dict[str, Dict[str, Any]],
+        _file_: str = None,
+        n_jobs: int = 4,
+        version: str = None
+    ) -&gt; None:
+        self.name: str = name
+        self.paramsets: Dict[str, Dict[str, Any]] = paramsets
+        self._file_: str = _file_
+        self.n_jobs: str = n_jobs
+        self.version: str = version
+
+        self._event_queue: Queue = None
+        self._event_handler: EventHandler = EventHandler()
+        self._event_emitter: EventEmitter = None
+        if _file_ is None:
+            _file_ = inspect.stack()[2][1]
+        self.dir_path = os.path.dirname(os.path.realpath(_file_))
+        self.function: Callable = function
+
+        self._logger: Logger = logging.getLogger(self.name)
+        self._logger.setLevel(logging.DEBUG)
+        self._remote_monitor: RemoteExperimentMonitor = None
+        self.state = ExperimentState(
+            self.name, self.version, list(self.paramsets.keys()))
+        state_manager = ExperimentStateManager(self.state)
+        state_manager.bootstrap(experiment=self)
+
+    def on_event(self, event_type: EventTypes):
+        &#34;&#34;&#34;Helper decorator to adding event listeners.
+
+        Args:
+            event_type (EventTypes): event type to listen for
+        &#34;&#34;&#34;
+        return self._event_handler.on_event(event_type)
+
+    def add_event_listener(self, event_type: EventTypes, handler: Callable):
+        &#34;&#34;&#34;Adds event listener
+
+        Args:
+            event_type (EventTypes): event type
+            handler (Callable): listener handler function
+        &#34;&#34;&#34;
+        return self._event_handler.add_event_listener(event_type, handler)
+
+    def _initilize_experiment_logger(self):
+        from . import settings as settings
+        conf.settings = settings
+        current_time_str: str = datetime.now(
+            tz=settings.EXPERIMENT_TIMEZONE).strftime(&#34;%d.%m.%Y_%H.%M.%S&#34;)
+
+        logs_dir_name: str = f&#39;{current_time_str}&#39;
+        if self.version is not None:
+            logs_dir_name += f&#39;v{self.version}&#39;
+
+        configure_logging(self._file_, logs_dir_name, self.dir_path)
+        configure_experiment_logger(self._logger)
+
+    def _initialize_remote_logger(self):
+        from . import settings as settings
+        if settings.REMOTE_LOGGING_ENABLED:
+            self._remote_monitor = RemoteExperimentMonitor()
+            self._remote_monitor.bootstrap(experiment=self)
+            self._remote_monitor.run()
+            self._logger.addHandler(RemoteLogsHandler(self._remote_monitor.logs_queue))
+            self._logger.debug(
+                f&#39;Forwarding experiment logs to remote server: &#39; +
+                f&#39;&#34;{settings.REMOTE_LOGGING_URL}&#34; run_id = {self._remote_monitor._run_id}&#39;)
+
+    def _run(self):
+        from . import settings
+        conf.settings = settings
+        logging.basicConfig(level=self._logger.level)
+        self._initilize_experiment_logger()
+
+        ExperimentContext.__GLOBAL_CONTEXT__ = ExperimentContext(
+            name=self.name,
+            version=self.version,
+            paramsets_names=list(self.paramsets.keys()),
+            paramset_name=None,
+            current_dir=self.dir_path,
+            logger=self._logger
+        )
+
+        event_queue: Queue = Manager().Queue()
+        self._event_handler.event_queue = event_queue
+        self._event_emitter = EventEmitter(event_queue=event_queue)
+
+        self._initialize_remote_logger()
+
+        self._event_emitter.emit_event(ExperimentStartEvent(self.name))
+        self._event_emitter.emit_event(ExperimentStartEvent(
+            self.name,
+            event_type=f&#39;{self.name}__EXPERIMENT_START&#39;
+        ))
+
+        runner = Runner(conf.settings)
+        try:
+            self._logger.debug(
+                f&#39;Starting experiment &#34;{self.name}&#34; v{self.version} (n_paramsets: {len(self.paramsets)})&#39;)
+            runner.run(experiment=self)
+        except KeyboardInterrupt:
+            self._remote_monitor._mark_experiment_as_killed()
+            self._event_emitter.emit_event(ExperimentEndEvent(self.name))
+        finally:
+            if self._remote_monitor is not None:
+                self._remote_monitor.terminate()
+            ExperimentContext.__GLOBAL_CONTEXT__ = None
+
+    __call__ = _run
+
+
+def experiment(
+    name: str,
+    paramsets: dict,
+    _file_: str = None,
+    n_jobs: int = 4,
+    version: str = None
+):
+    &#34;&#34;&#34;Decorator for experiment functions
+
+    Args:
+        name (str): Name of experiment (used for generating results)
+        configurations (List[dict]): List with dictionaries containing params for experiment
+        _file_ (str) optional __file__ variable from experiment main file. It will be automatically detected.
+        max_threads (int) max number of threard, Default 8
+        version (str) version string, Default is None
+    &#34;&#34;&#34;
+    def wrapper(function):
+        return Experiment(
+            name=name,
+            paramsets=paramsets,
+            _file_=_file_,
+            n_jobs=n_jobs,
+            version=version,
+
+            function=function
+        )
+    return wrapper</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="experiments_utils.experiment.experiment"><code class="name flex">
+<span>def <span class="ident">experiment</span></span>(<span>name: str, paramsets: dict, n_jobs: int = 4, version: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decorator for experiment functions</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of experiment (used for generating results)</dd>
+<dt><strong><code>configurations</code></strong> :&ensp;<code>List[dict]</code></dt>
+<dd>List with dictionaries containing params for experiment</dd>
+</dl>
+<p><em>file</em> (str) optional <strong>file</strong> variable from experiment main file. It will be automatically detected.
+max_threads (int) max number of threard, Default 8
+version (str) version string, Default is None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def experiment(
+    name: str,
+    paramsets: dict,
+    _file_: str = None,
+    n_jobs: int = 4,
+    version: str = None
+):
+    &#34;&#34;&#34;Decorator for experiment functions
+
+    Args:
+        name (str): Name of experiment (used for generating results)
+        configurations (List[dict]): List with dictionaries containing params for experiment
+        _file_ (str) optional __file__ variable from experiment main file. It will be automatically detected.
+        max_threads (int) max number of threard, Default 8
+        version (str) version string, Default is None
+    &#34;&#34;&#34;
+    def wrapper(function):
+        return Experiment(
+            name=name,
+            paramsets=paramsets,
+            _file_=_file_,
+            n_jobs=n_jobs,
+            version=version,
+
+            function=function
+        )
+    return wrapper</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="experiments_utils.experiment.Experiment"><code class="flex name class">
+<span>class <span class="ident">Experiment</span></span>
+<span>(</span><span>function, name: str, paramsets: Dict[str, Dict[str, Any]], n_jobs: int = 4, version: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrapping class for experiment function.
+It allows:
+* running experimen function with multiple sets of parameters on multiple processes
+* accessing basic experiment info like name or version
+* accessing experiment logger
+* listening to different experiment events - to see</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Experiment:
+    &#34;&#34;&#34;Wrapping class for experiment function.
+    It allows:
+        * running experimen function with multiple sets of parameters on multiple processes
+        * accessing basic experiment info like name or version
+        * accessing experiment logger
+        * listening to different experiment events - to see
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        function,
+        name: str,
+        paramsets: Dict[str, Dict[str, Any]],
+        _file_: str = None,
+        n_jobs: int = 4,
+        version: str = None
+    ) -&gt; None:
+        self.name: str = name
+        self.paramsets: Dict[str, Dict[str, Any]] = paramsets
+        self._file_: str = _file_
+        self.n_jobs: str = n_jobs
+        self.version: str = version
+
+        self._event_queue: Queue = None
+        self._event_handler: EventHandler = EventHandler()
+        self._event_emitter: EventEmitter = None
+        if _file_ is None:
+            _file_ = inspect.stack()[2][1]
+        self.dir_path = os.path.dirname(os.path.realpath(_file_))
+        self.function: Callable = function
+
+        self._logger: Logger = logging.getLogger(self.name)
+        self._logger.setLevel(logging.DEBUG)
+        self._remote_monitor: RemoteExperimentMonitor = None
+        self.state = ExperimentState(
+            self.name, self.version, list(self.paramsets.keys()))
+        state_manager = ExperimentStateManager(self.state)
+        state_manager.bootstrap(experiment=self)
+
+    def on_event(self, event_type: EventTypes):
+        &#34;&#34;&#34;Helper decorator to adding event listeners.
+
+        Args:
+            event_type (EventTypes): event type to listen for
+        &#34;&#34;&#34;
+        return self._event_handler.on_event(event_type)
+
+    def add_event_listener(self, event_type: EventTypes, handler: Callable):
+        &#34;&#34;&#34;Adds event listener
+
+        Args:
+            event_type (EventTypes): event type
+            handler (Callable): listener handler function
+        &#34;&#34;&#34;
+        return self._event_handler.add_event_listener(event_type, handler)
+
+    def _initilize_experiment_logger(self):
+        from . import settings as settings
+        conf.settings = settings
+        current_time_str: str = datetime.now(
+            tz=settings.EXPERIMENT_TIMEZONE).strftime(&#34;%d.%m.%Y_%H.%M.%S&#34;)
+
+        logs_dir_name: str = f&#39;{current_time_str}&#39;
+        if self.version is not None:
+            logs_dir_name += f&#39;v{self.version}&#39;
+
+        configure_logging(self._file_, logs_dir_name, self.dir_path)
+        configure_experiment_logger(self._logger)
+
+    def _initialize_remote_logger(self):
+        from . import settings as settings
+        if settings.REMOTE_LOGGING_ENABLED:
+            self._remote_monitor = RemoteExperimentMonitor()
+            self._remote_monitor.bootstrap(experiment=self)
+            self._remote_monitor.run()
+            self._logger.addHandler(RemoteLogsHandler(self._remote_monitor.logs_queue))
+            self._logger.debug(
+                f&#39;Forwarding experiment logs to remote server: &#39; +
+                f&#39;&#34;{settings.REMOTE_LOGGING_URL}&#34; run_id = {self._remote_monitor._run_id}&#39;)
+
+    def _run(self):
+        from . import settings
+        conf.settings = settings
+        logging.basicConfig(level=self._logger.level)
+        self._initilize_experiment_logger()
+
+        ExperimentContext.__GLOBAL_CONTEXT__ = ExperimentContext(
+            name=self.name,
+            version=self.version,
+            paramsets_names=list(self.paramsets.keys()),
+            paramset_name=None,
+            current_dir=self.dir_path,
+            logger=self._logger
+        )
+
+        event_queue: Queue = Manager().Queue()
+        self._event_handler.event_queue = event_queue
+        self._event_emitter = EventEmitter(event_queue=event_queue)
+
+        self._initialize_remote_logger()
+
+        self._event_emitter.emit_event(ExperimentStartEvent(self.name))
+        self._event_emitter.emit_event(ExperimentStartEvent(
+            self.name,
+            event_type=f&#39;{self.name}__EXPERIMENT_START&#39;
+        ))
+
+        runner = Runner(conf.settings)
+        try:
+            self._logger.debug(
+                f&#39;Starting experiment &#34;{self.name}&#34; v{self.version} (n_paramsets: {len(self.paramsets)})&#39;)
+            runner.run(experiment=self)
+        except KeyboardInterrupt:
+            self._remote_monitor._mark_experiment_as_killed()
+            self._event_emitter.emit_event(ExperimentEndEvent(self.name))
+        finally:
+            if self._remote_monitor is not None:
+                self._remote_monitor.terminate()
+            ExperimentContext.__GLOBAL_CONTEXT__ = None
+
+    __call__ = _run</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="experiments_utils.experiment.Experiment.add_event_listener"><code class="name flex">
+<span>def <span class="ident">add_event_listener</span></span>(<span>self, event_type: EventTypes, handler: Callable)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds event listener</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>event_type</code></strong> :&ensp;<code>EventTypes</code></dt>
+<dd>event type</dd>
+<dt><strong><code>handler</code></strong> :&ensp;<code>Callable</code></dt>
+<dd>listener handler function</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_event_listener(self, event_type: EventTypes, handler: Callable):
+    &#34;&#34;&#34;Adds event listener
+
+    Args:
+        event_type (EventTypes): event type
+        handler (Callable): listener handler function
+    &#34;&#34;&#34;
+    return self._event_handler.add_event_listener(event_type, handler)</code></pre>
+</details>
+</dd>
+<dt id="experiments_utils.experiment.Experiment.on_event"><code class="name flex">
+<span>def <span class="ident">on_event</span></span>(<span>self, event_type: EventTypes)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Helper decorator to adding event listeners.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>event_type</code></strong> :&ensp;<code>EventTypes</code></dt>
+<dd>event type to listen for</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def on_event(self, event_type: EventTypes):
+    &#34;&#34;&#34;Helper decorator to adding event listeners.
+
+    Args:
+        event_type (EventTypes): event type to listen for
+    &#34;&#34;&#34;
+    return self._event_handler.on_event(event_type)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="experiments_utils" href="index.html">experiments_utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="experiments_utils.experiment.experiment" href="#experiments_utils.experiment.experiment">experiment</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="experiments_utils.experiment.Experiment" href="#experiments_utils.experiment.Experiment">Experiment</a></code></h4>
+<ul class="">
+<li><code><a title="experiments_utils.experiment.Experiment.add_event_listener" href="#experiments_utils.experiment.Experiment.add_event_listener">add_event_listener</a></code></li>
+<li><code><a title="experiments_utils.experiment.Experiment.on_event" href="#experiments_utils.experiment.Experiment.on_event">on_event</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
