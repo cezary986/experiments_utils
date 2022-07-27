@@ -19,10 +19,10 @@ class Store(object):
     def __getattribute__(self, name: str) -> Any:
         if name == '__variables__':
             return object.__getattribute__(self, '__variables__')
-        if name == '_State__retrieve_variable':
-            return object.__getattribute__(self, '_State__retrieve_variable')
-        if name == '_State__save_variable':
-            return object.__getattribute__(self, '_State__save_variable')
+        if name == '_Store__retrieve_variable':
+            return object.__getattribute__(self, '_Store__retrieve_variable')
+        if name == '_Store__save_variable':
+            return object.__getattribute__(self, '_Store__save_variable')
         if name == '__class__':
             return Store
         if name == '__module__':
