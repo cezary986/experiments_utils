@@ -1,11 +1,9 @@
-from ast import arg
 from ctypes import Union
 import logging
 import traceback
 from datetime import datetime
 from typing import Any, List, Tuple
 
-from pyrsistent import b
 from .state import ExperimentState, ParamSetState
 from .events.event_types import EventTypes
 from .events import *
@@ -16,7 +14,6 @@ from multiprocess.queues import Queue
 from multiprocess import Process
 from multiprocess import Manager
 import requests
-from signal import signal, SIGTERM
 import time
 
 

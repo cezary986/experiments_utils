@@ -68,6 +68,7 @@ class Runner:
             basicConfig(level=context.logger.level)
             try:
                 sleep(0.2)
+                self._logger.info(f'Starting experiment for paramset: "{context.paramset_name}"')
                 event_emitter.emit_event(ParamsetStartEvent(
                     self._name, context.paramset_name))
                 event_emitter.emit_event(ParamsetStartEvent(
@@ -75,9 +76,11 @@ class Runner:
                     context.paramset_name,
                     event_type=f'{context.paramset_name}__PARAMSET_START'
                 ))
+                start_time = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
 
                 experiment_function(*experiment_params.values())
 
+                self._logger.info(f'Finished experiment for paramset: "{context.paramset_name}". Took: {datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE) - start_time}')
                 event_emitter.emit_event(ParamsetSuccessEvent(
                     self._name,
                     context.paramset_name,
@@ -86,6 +89,7 @@ class Runner:
                 event_emitter.emit_event(ParamsetSuccessEvent(
                     self._name, context.paramset_name))
             except Exception as exception:
+                self._logger.info(f'Exception during experiment for paramset: "{context.paramset_name}". Took: {datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE) - start_time}')
                 stack_trace: str = traceback.format_exc()
                 context.logger.error(exception, exc_info=True)
                 event_emitter.emit_event(ParamsetErrorEvent(
@@ -124,7 +128,10 @@ class Runner:
                 EventEmitter(self._event_queue)
             ) for paramset_name, paramset in experiment.paramsets.items()
         ]
+        experiment_start_time = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
         with Pool(experiment.n_jobs) as executor:
             executor.map_async(inner_wrapper, params_sets)
             experiment._event_handler.start_listening_for_events(
                 len(params_sets))
+        self._logger.info(
+                f'Finished whole experiment "{self._name}". Took: {datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE) - experiment_start_time}')
