@@ -1,5 +1,6 @@
 from logging import Logger, basicConfig
 import logging
+import sys
 from time import sleep
 import traceback
 from .events.emitter import EventEmitter
@@ -68,6 +69,9 @@ class Runner:
             basicConfig(level=context.logger.level)
             try:
                 sleep(0.2)
+                console_handler = logging.StreamHandler(sys.stdout)
+                console_handler.setFormatter(logging.Formatter(conf.settings.LOGS_FORMAT))
+                self._logger.addHandler(console_handler)
                 self._logger.info(f'Starting experiment for paramset: "{context.paramset_name}"')
                 event_emitter.emit_event(ParamsetStartEvent(
                     self._name, context.paramset_name))
