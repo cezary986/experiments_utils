@@ -34,7 +34,7 @@ class Experiment:
         self,
         function,
         name: str,
-        paramsets: Dict[str, Dict[str, Any]],
+        paramsets: Dict[str, Dict[str, Any]] = None,
         _file_: str = None,
         n_jobs: int = 4,
         version: str = None
@@ -56,10 +56,8 @@ class Experiment:
         self._logger: Logger = logging.getLogger(self.name)
         self._logger.setLevel(logging.DEBUG)
         self._remote_monitor: RemoteExperimentMonitor = None
-        self.state = ExperimentState(
-            self.name, self.version, list(self.paramsets.keys()))
-        state_manager = ExperimentStateManager(self.state)
-        state_manager.bootstrap(experiment=self)
+        self.state = None
+        state_manager = None
 
     def on_event(self, event_type: EventTypes):
         """Helper decorator to adding event listeners.
@@ -97,12 +95,50 @@ class Experiment:
             self._remote_monitor = RemoteExperimentMonitor()
             self._remote_monitor.bootstrap(experiment=self)
             self._remote_monitor.run()
-            self._logger.addHandler(RemoteLogsHandler(self._remote_monitor.logs_queue))
+            self._logger.addHandler(RemoteLogsHandler(
+                self._remote_monitor.logs_queue))
             self._logger.debug(
                 f'Forwarding experiment logs to remote server: ' +
                 f'"{settings.REMOTE_LOGGING_URL}" run_id = {self._remote_monitor._run_id}')
 
-    def _run(self):
+    def _run(self, paramsets: Dict[str, Dict[str, Any]] = None):
+        if paramsets is None and self.paramsets is None:
+            raise Exception('''No paramsets were passed to experiment. Pass them either when calling experiment or in decorator.
+    
+Example:
+
+    @experiment(name="example_experiment") 
+    def example_experiment(a: int, b: int):
+        ...
+
+    if __name__ == '__main__:
+        example_experiment({
+-->        'paramset_1': {'a': 1, 'b': 2},
+            ...
+        })
+
+Alternatively:
+
+    @experiment(
+        name="example_experiment",
+-->     paramsets={
+            'paramset_1': {'a': 1, 'b': 2},
+            ...
+        }
+    ) 
+    def example_experiment(a: int, b: int):
+        ...
+
+    if __name__ == '__main__:
+        example_experiment()
+                ''')
+        if paramsets is not None:
+            self.paramsets = paramsets
+        self.state = ExperimentState(
+            self.name, self.version, list(self.paramsets.keys()))
+        state_manager = ExperimentStateManager(self.state)
+        state_manager.bootstrap(experiment=self)
+
         from . import settings
         conf.settings = settings
         logging.basicConfig(level=self._logger.level)
@@ -148,7 +184,7 @@ class Experiment:
 
 def experiment(
     name: str,
-    paramsets: dict,
+    paramsets: Dict[str, Dict[str, Any]] = None,
     _file_: str = None,
     n_jobs: int = 4,
     version: str = None
@@ -157,7 +193,7 @@ def experiment(
 
     Args:
         name (str): Name of experiment (used for generating results)
-        configurations (List[dict]): List with dictionaries containing params for experiment
+        paramsets (Dict[str, Dict[str, Any]]): dictionary containing sets of parameters for experiment to run with
         _file_ (str) optional __file__ variable from experiment main file. It will be automatically detected.
         max_threads (int) max number of threard, Default 8
         version (str) version string, Default is None
