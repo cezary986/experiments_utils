@@ -265,7 +265,7 @@ class RemoteExperimentMonitor:
                     steps_completed[step_name] = paramset_state._steps_state[step_name].finished.strftime(
                         f'%Y-%m-%d-%H:%M:%S')
             self._configs_execution[config_name] = {
-                **self._configs_execution[config_name],
+                **self._configs_execution.get(config_name, {}),
                 **{
                     'config_name': config_name,
                     'steps': self._experiment_state.steps_names,
@@ -295,7 +295,7 @@ class RemoteExperimentMonitor:
             if paramset_name not in self._configs_execution:
                 self._configs_execution[paramset_name] = {}
             self._configs_execution[paramset_name] = {
-                **self._configs_execution[paramset_name],
+                **self._configs_execution.get(paramset_name, {}),
                 **{
                     'config_name': paramset_name,
                     'steps': self._experiment_state.steps_names,
@@ -333,7 +333,7 @@ class RemoteExperimentMonitor:
             url = f'{self.api_url}/api/experiments_runs/{self._run_id}/'
 
             self._configs_execution[paramset_name] = {
-                **self._configs_execution[paramset_name],
+                **self._configs_execution.get(paramset_name, {}),
                 **{
                     'config_name': paramset_name,
                     'steps': self._experiment_state.steps_names,
