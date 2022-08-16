@@ -13,7 +13,7 @@ class Store(object):
     def __init__(self) -> None:
         context: ExperimentContext = ExperimentContext.__GLOBAL_CONTEXT__
         object.__setattr__(self, '__variables__', {})
-        params_file_path = f'{context.current_dir}/_cache/{context.paramset_name}'
+        params_file_path = f'{context.current_dir}/_cache/{context.version}/{context.paramset_name}'
         object.__setattr__(self, '__params_base_dir_path', params_file_path)
 
     def __getattribute__(self, name: str) -> Any:

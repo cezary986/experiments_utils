@@ -57,7 +57,6 @@ class Experiment:
         self._logger.setLevel(logging.DEBUG)
         self._remote_monitor: RemoteExperimentMonitor = None
         self.state = None
-        state_manager = None
 
     def on_event(self, event_type: EventTypes):
         """Helper decorator to adding event listeners.

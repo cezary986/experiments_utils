@@ -81,7 +81,7 @@ class Step:
             self._experiment_logger.info(f'Exception during step "{self.name}" for paramset "{self.paramset_name}". Took: {now - start_time}')
             self.logger.info(f'Exception during step "{self.name}" for paramset "{self.paramset_name}". Took: {now - start_time}')
 
-            self._logger.error(error, exc_info=True)
+            self.logger.error(error, exc_info=True)
             stack_trace: str = traceback.format_exc()
             event_emitter.emit_event(StepErrorEvent(
                 self.experiment_name,
