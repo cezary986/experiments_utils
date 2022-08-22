@@ -60,8 +60,11 @@ class Table:
             self._load()
 
     def _load(self):
-        df: pd.DataFrame = pd.read_csv(self._file_path)
-        self.rows = df.to_dict('records')
+        try:
+            df: pd.DataFrame = pd.read_csv(self._file_path)
+            self.rows = df.to_dict('records')
+        except pd.errors.EmptyDataError:
+            return pd.DataFrame([])
 
     def save(self):
         self.as_pandas().to_csv(self._file_path, index=False)
