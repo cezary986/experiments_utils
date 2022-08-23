@@ -278,6 +278,9 @@ class ExperimentStateManager:
             paramset_state._error_stack_trace = event.stack_trace
             paramset_state._finished = event.timestamp
             paramset_state._state = States.FAILED
+            self._state._paramsets_state[event.paramset_name] = paramset_state
+            self._state.errors.append(event.exception)
+            self._state.errors_stack_traces.append(event.stack_trace)
             if event.paramset_name in self._state._running_paramsets:
                 self._state._running_paramsets.remove(event.paramset_name)
             self._state._failed_paramsets.append(event.paramset_name)
