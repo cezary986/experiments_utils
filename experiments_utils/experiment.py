@@ -1,18 +1,16 @@
 from __future__ import annotations
 from logging import Logger
 import logging
-from time import sleep
 from typing import Any, Callable, Dict
 import os
 from datetime import datetime
-from .logs import configure_experiment_logger, configure_logging
+from .logs import*
 from . import conf
 from .events.emitter import EventEmitter
 from .events.handler import EventHandler
 from .events import EventTypes
 from .events.events import *
 from .runner import Runner
-from .store import Store
 from .remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
 from .state import ExperimentStateManager, ExperimentState
 from .context import ExperimentContext
@@ -90,7 +88,7 @@ class Experiment:
 
     def _initialize_remote_logger(self):
         from . import settings as settings
-        if settings.REMOTE_LOGGING_ENABLED:
+        if settings.REMOTE_LOGGING_ENABLED and not debugger_is_active():
             self._remote_monitor = RemoteExperimentMonitor()
             self._remote_monitor.bootstrap(experiment=self)
             self._remote_monitor.run()

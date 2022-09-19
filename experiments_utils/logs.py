@@ -12,7 +12,14 @@ logging_levels = [
 ]
 
 
+def debugger_is_active() -> bool:
+    """Return if the debugger is currently active"""
+    return hasattr(sys, 'gettrace') and sys.gettrace() is not None
+
 def configure_logging(_file_, run_log_dir: str, dir_path: str):
+    if debugger_is_active():
+        print('Debugging session is active - preventing file and remote logging to reduce logs mess')
+        return
     if conf.settings.EXPERIMENT_BASE_LOGGING_DIR is None:
         conf.settings.EXPERIMENT_BASE_LOGGING_DIR = f'{dir_path}/logs/{run_log_dir}'
         print(
@@ -31,14 +38,15 @@ def get_step_logger(name: str, config_key: str) -> logging.Logger:
     logger = logging.getLogger(f'{name}.{config_key}')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stdout))
-    # create file handler which logs even debug messages
 
-    for level_name, level in logging_levels:
-        fh = logging.FileHandler(f'{log_file_path}.{level_name}.log')
-        formatter = logging.Formatter(conf.settings.LOGS_FORMAT)
-        fh.setFormatter(formatter)
-        fh.setLevel(level)
-        logger.addHandler(fh)
+    if not debugger_is_active():
+        # create file handler which logs even debug messages
+        for level_name, level in logging_levels:
+            fh = logging.FileHandler(f'{log_file_path}.{level_name}.log')
+            formatter = logging.Formatter(conf.settings.LOGS_FORMAT)
+            fh.setFormatter(formatter)
+            fh.setLevel(level)
+            logger.addHandler(fh)
 
     return logger
 
@@ -52,13 +60,14 @@ def configure_experiment_logger(logger: logging.Logger):
     # create file handler which logs even debug messages
     log_file_path = f'{conf.settings.EXPERIMENT_BASE_LOGGING_DIR}/log'
 
-    for level_name, level in logging_levels:
-        fh = logging.FileHandler(f'{log_file_path}.{level_name}.log')
-        formatter = logging.Formatter(
-            '[%(levelname)s] %(asctime)s %(message)s')
-        fh.setFormatter(formatter)
-        fh.setLevel(level)
-        logger.addHandler(fh)
+    if not debugger_is_active():
+        for level_name, level in logging_levels:
+            fh = logging.FileHandler(f'{log_file_path}.{level_name}.log')
+            formatter = logging.Formatter(
+                '[%(levelname)s] %(asctime)s %(message)s')
+            fh.setFormatter(formatter)
+            fh.setLevel(level)
+            logger.addHandler(fh)
 
 
 def clear_logs():
