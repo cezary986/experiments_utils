@@ -1,11 +1,9 @@
-from ast import arg
 from ctypes import Union
 import logging
 import traceback
 from datetime import datetime
 from typing import Any, List, Tuple
 
-from pyrsistent import b
 from .state import ExperimentState, ParamSetState
 from .events.event_types import EventTypes
 from .events import *
@@ -16,7 +14,6 @@ from multiprocess.queues import Queue
 from multiprocess import Process
 from multiprocess import Manager
 import requests
-from signal import signal, SIGTERM
 import time
 
 
@@ -160,6 +157,11 @@ class RemoteExperimentMonitor:
         def _(event: ExperimentStartEvent):
             self._create_experiment()
 
+        @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_START)
+        def _(event: ParamsetEndEvent):
+            self._mark_experiment_as_started(
+                paramset_name=event.paramset_name)
+
         @experiment.on_event(EventTypes.EXPERIMENT_PARAMSET_SUCCESS)
         def _(event: ParamsetEndEvent):
             self._mark_experiment_as_finished(
@@ -268,7 +270,7 @@ class RemoteExperimentMonitor:
                     steps_completed[step_name] = paramset_state._steps_state[step_name].finished.strftime(
                         f'%Y-%m-%d-%H:%M:%S')
             self._configs_execution[config_name] = {
-                **self._configs_execution[config_name],
+                **self._configs_execution.get(config_name, {}),
                 **{
                     'config_name': config_name,
                     'steps': self._experiment_state.steps_names,
@@ -298,7 +300,7 @@ class RemoteExperimentMonitor:
             if paramset_name not in self._configs_execution:
                 self._configs_execution[paramset_name] = {}
             self._configs_execution[paramset_name] = {
-                **self._configs_execution[paramset_name],
+                **self._configs_execution.get(paramset_name, {}),
                 **{
                     'config_name': paramset_name,
                     'steps': self._experiment_state.steps_names,
@@ -336,12 +338,47 @@ class RemoteExperimentMonitor:
             url = f'{self.api_url}/api/experiments_runs/{self._run_id}/'
 
             self._configs_execution[paramset_name] = {
-                **self._configs_execution[paramset_name],
+                **self._configs_execution.get(paramset_name, {}),
                 **{
                     'config_name': paramset_name,
                     'steps': self._experiment_state.steps_names,
                     'has_errors': False,
                     'finished': datetime.timestamp(datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)) * 1000,
+                }
+            }
+            finished_paramsets: int = len(
+                self._experiment_state.finished_paramsets) + len(self._experiment_state.failed_paramsets)
+            payload = {
+                'finished_configs': finished_paramsets,
+                'configs_execution': self._configs_execution
+            }
+            if finished_paramsets == len(self._experiment_state.paramsets_names):
+                payload['finished'] = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE).strftime(
+                    f'%Y-%m-%d-%H:%M:%S')
+            response = requests.patch(
+                url, json=payload, headers=headers, auth=conf.settings.REMOTE_LOGGING_CREDENTIALS)
+            if response.status_code != 200:
+                self._logger.error(
+                    f'Failed to save experiment finished info to remote server "{self.api_url}". Server returned {response.status_code} status code and following error:')
+                self._logger.error(response.text)
+        except Exception as error:
+            self._logger.error(
+                f'Failed to save experiment finished info to remote server "{self.api_url}". With following exception:')
+            self._logger.error(str(error))
+            self._logger.error(traceback.format_exc())
+    
+    def _mark_experiment_as_started(self, paramset_name: str):
+        try:
+            headers = {'content-type': 'application/json'}
+            url = f'{self.api_url}/api/experiments_runs/{self._run_id}/'
+
+            self._configs_execution[paramset_name] = {
+                **self._configs_execution.get(paramset_name, {}),
+                **{
+                    'config_name': paramset_name,
+                    'steps': self._experiment_state.steps_names,
+                    'has_errors': False,
+                    'started': datetime.timestamp(datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)) * 1000,
                 }
             }
             finished_paramsets: int = len(

@@ -1,12 +1,13 @@
 from multiprocess.queues import Queue
 from .event_types import EventTypes
-from .events import _BaseEvent, ExperimentEndEvent, ExperimentSuccessEvent
+from .events import _BaseEvent, ExperimentEndEvent, ExperimentSuccessEvent, ParamsetSuccessEvent
 from typing import Any, Callable, Dict, List, Union
 
 
 class EventHandler:
 
     def __init__(self) -> None:
+        self._results: Dict[str, Any] = {}
         self._event_queue: Queue = None
         self._event_listeners: Dict[str, List[Callable]] = {
             event_type.value: [] for event_type in EventTypes
@@ -45,6 +46,9 @@ class EventHandler:
         return wrapper
 
     def _handle_event(self, event: _BaseEvent = []):
+        if event.event_type == EventTypes.EXPERIMENT_PARAMSET_SUCCESS.value:
+            event: ParamsetSuccessEvent = event
+            self._results[event.paramset_name] = event.result
         for listener in self._event_listeners.get(event.event_type, []):
             listener(event)
         for listener in self._event_listeners.get('*', []):

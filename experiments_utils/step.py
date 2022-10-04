@@ -1,8 +1,10 @@
 from __future__ import annotations
 from logging import Logger
 from typing import Callable, List
-from .logs import get_step_logger
+from datetime import datetime
 import traceback
+from .logs import get_step_logger
+from . import conf
 from .context import ExperimentContext
 from .events.emitter import EventEmitter
 from .events import StepStartEvent, StepEndEvent, StepErrorEvent, StepSuccessEvent
@@ -30,6 +32,7 @@ class Step:
         self.experiment_name: str = None
         self.paramset_name: str = None
         self.logger: Logger = None
+        self._experiment_logger: Logger = None
 
     def run(self, *args, **kwargs):
         """Run step function"""
@@ -37,7 +40,8 @@ class Step:
         event_emitter: EventEmitter = ExperimentContext.__EVENT_EMITTER__
         self.experiment_name = context.name
         self.paramset_name = context.paramset_name
-        self._logger = get_step_logger(self.name, self.paramset_name)
+        self.logger = get_step_logger(self.name, self.paramset_name)
+        self._experiment_logger = context.logger
 
         event_emitter.emit_event(StepStartEvent(
             self.experiment_name,
@@ -51,7 +55,16 @@ class Step:
             event_type=f'{self.name}__STEP_START'
         ))
         try:
+            start_time = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
+            self.logger.info(f'Started step "{self.name}" for paramset "{self.paramset_name}"')
+            self._experiment_logger.info(f'Started step "{self.name}" for paramset "{self.paramset_name}"')
+            
             result = self.function(*args, **kwargs)
+            
+            now = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
+            self.logger.info(f'Finished step "{self.name}" for paramset "{self.paramset_name}". Took: {now - start_time}')
+            self._experiment_logger.info(f'Finished step "{self.name}" for paramset "{self.paramset_name}". Took: {now - start_time}')
+            
             event_emitter.emit_event(StepSuccessEvent(
                 self.experiment_name,
                 self.paramset_name,
@@ -64,7 +77,11 @@ class Step:
                 event_type=f'{self.name}__STEP_SUCCESS'
             ))
         except Exception as error:
-            self._logger.error(error, exc_info=True)
+            now = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
+            self._experiment_logger.info(f'Exception during step "{self.name}" for paramset "{self.paramset_name}". Took: {now - start_time}')
+            self.logger.info(f'Exception during step "{self.name}" for paramset "{self.paramset_name}". Took: {now - start_time}')
+
+            self.logger.error(error, exc_info=True)
             stack_trace: str = traceback.format_exc()
             event_emitter.emit_event(StepErrorEvent(
                 self.experiment_name,

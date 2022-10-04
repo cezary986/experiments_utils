@@ -1,18 +1,16 @@
 from __future__ import annotations
 from logging import Logger
 import logging
-from time import sleep
 from typing import Any, Callable, Dict
 import os
 from datetime import datetime
-from .logs import configure_experiment_logger, configure_logging
+from .logs import *
 from . import conf
 from .events.emitter import EventEmitter
 from .events.handler import EventHandler
 from .events import EventTypes
 from .events.events import *
 from .runner import Runner
-from .store import Store
 from .remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
 from .state import ExperimentStateManager, ExperimentState
 from .context import ExperimentContext
@@ -34,32 +32,40 @@ class Experiment:
         self,
         function,
         name: str,
-        paramsets: Dict[str, Dict[str, Any]],
+        paramsets: Dict[str, Dict[str, Any]] = None,
         _file_: str = None,
         n_jobs: int = 4,
         version: str = None
     ) -> None:
         self.name: str = name
         self.paramsets: Dict[str, Dict[str, Any]] = paramsets
-        self._file_: str = _file_
+  
         self.n_jobs: str = n_jobs
         self.version: str = version
+
+        self.results: Dict[str, Any] = None
 
         self._event_queue: Queue = None
         self._event_handler: EventHandler = EventHandler()
         self._event_emitter: EventEmitter = None
-        if _file_ is None:
-            _file_ = inspect.stack()[2][1]
-        self.dir_path = os.path.dirname(os.path.realpath(_file_))
+        
+        self._file_: str = _file_
+        self.dir_path: str = self._resolve_active_dir()
         self.function: Callable = function
 
         self._logger: Logger = logging.getLogger(self.name)
         self._logger.setLevel(logging.DEBUG)
         self._remote_monitor: RemoteExperimentMonitor = None
-        self.state = ExperimentState(
-            self.name, self.version, list(self.paramsets.keys()))
-        state_manager = ExperimentStateManager(self.state)
-        state_manager.bootstrap(experiment=self)
+        self.state = None
+
+    def _resolve_active_dir(self) -> str:
+        if run_from_ipython():
+            # when running from ipython __file__ inspect stact won't return correct path
+            return os.path.abspath(os.curdir)
+        else:
+            if self._file_ is None:
+               self. _file_ = inspect.stack()[2][1]
+            return  os.path.dirname(os.path.realpath(self._file_))
 
     def on_event(self, event_type: EventTypes):
         """Helper decorator to adding event listeners.
@@ -93,16 +99,60 @@ class Experiment:
 
     def _initialize_remote_logger(self):
         from . import settings as settings
-        if settings.REMOTE_LOGGING_ENABLED:
+        if settings.REMOTE_LOGGING_ENABLED and not debugger_is_active():
             self._remote_monitor = RemoteExperimentMonitor()
             self._remote_monitor.bootstrap(experiment=self)
             self._remote_monitor.run()
-            self._logger.addHandler(RemoteLogsHandler(self._remote_monitor.logs_queue))
+            self._logger.addHandler(RemoteLogsHandler(
+                self._remote_monitor.logs_queue))
             self._logger.debug(
                 f'Forwarding experiment logs to remote server: ' +
                 f'"{settings.REMOTE_LOGGING_URL}" run_id = {self._remote_monitor._run_id}')
 
-    def _run(self):
+    def _run(self, paramsets: Dict[str, Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Runs experiment
+    
+        Returns:
+            Dict[str, Any]: Experiment results returned from each calling of experiment function group by dictionary
+                where paramset names are keys.
+        """
+        if paramsets is None and self.paramsets is None:
+            raise Exception('''No paramsets were passed to experiment. Pass them either when calling experiment or in decorator.
+    
+Example:
+
+    @experiment(name="example_experiment") 
+    def example_experiment(a: int, b: int):
+        ...
+
+    if __name__ == '__main__:
+        example_experiment({
+-->        'paramset_1': {'a': 1, 'b': 2},
+            ...
+        })
+
+Alternatively:
+
+    @experiment(
+        name="example_experiment",
+-->     paramsets={
+            'paramset_1': {'a': 1, 'b': 2},
+            ...
+        }
+    ) 
+    def example_experiment(a: int, b: int):
+        ...
+
+    if __name__ == '__main__:
+        example_experiment()
+                ''')
+        if paramsets is not None:
+            self.paramsets = paramsets
+        self.state = ExperimentState(
+            self.name, self.version, list(self.paramsets.keys()))
+        state_manager = ExperimentStateManager(self.state)
+        state_manager.bootstrap(experiment=self)
+
         from . import settings
         conf.settings = settings
         logging.basicConfig(level=self._logger.level)
@@ -139,16 +189,18 @@ class Experiment:
                 self._remote_monitor._mark_experiment_as_killed()
             self._event_emitter.emit_event(ExperimentEndEvent(self.name))
         finally:
+            self.results = self._event_handler._results
             if self._remote_monitor is not None:
                 self._remote_monitor.terminate()
             ExperimentContext.__GLOBAL_CONTEXT__ = None
+        return self.results
 
     __call__ = _run
 
 
 def experiment(
     name: str,
-    paramsets: dict,
+    paramsets: Dict[str, Dict[str, Any]] = None,
     _file_: str = None,
     n_jobs: int = 4,
     version: str = None
@@ -157,7 +209,7 @@ def experiment(
 
     Args:
         name (str): Name of experiment (used for generating results)
-        configurations (List[dict]): List with dictionaries containing params for experiment
+        paramsets (Dict[str, Dict[str, Any]]): dictionary containing sets of parameters for experiment to run with
         _file_ (str) optional __file__ variable from experiment main file. It will be automatically detected.
         max_threads (int) max number of threard, Default 8
         version (str) version string, Default is None

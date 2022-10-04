@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from .event_types import EventTypes
 from .. import conf
 
@@ -152,10 +153,12 @@ class ParamsetSuccessEvent(ExperimentParamSetEvent):
         self,
         experiment_name: str,
         paramset_name: str,
-        event_type: str = EventTypes.EXPERIMENT_PARAMSET_SUCCESS.value
+        event_type: str = EventTypes.EXPERIMENT_PARAMSET_SUCCESS.value,
+        result: Any = None
     ) -> None:
         super().__init__(event_type,
                          experiment_name, paramset_name)
+        self.result: Any = result
 
 
 class ParamsetErrorEvent(ExperimentParamSetEvent, ErrorEvent):
