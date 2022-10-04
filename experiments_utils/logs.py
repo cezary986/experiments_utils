@@ -11,6 +11,12 @@ logging_levels = [
     ('ERROR', logging.ERROR),
 ]
 
+def run_from_ipython() -> bool:
+    try:
+        __IPYTHON__
+        return True
+    except NameError:
+        return False
 
 def debugger_is_active() -> bool:
     """Return if the debugger is currently active"""
@@ -37,7 +43,8 @@ def get_step_logger(name: str, config_key: str) -> logging.Logger:
     log_file_path = f'{log_file_path}/{name}'
     logger = logging.getLogger(f'{name}.{config_key}')
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler(sys.stdout))
+    if not run_from_ipython():
+        logger.addHandler(logging.StreamHandler(sys.stdout))
 
     if not debugger_is_active():
         # create file handler which logs even debug messages
@@ -52,11 +59,11 @@ def get_step_logger(name: str, config_key: str) -> logging.Logger:
 
 
 def configure_experiment_logger(logger: logging.Logger):
-    logger.setLevel(logging.DEBUG)
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(logging.Formatter(conf.settings.LOGS_FORMAT))
-    logger.addHandler(console_handler)
-    logger
+    logger.setLevel(logger.level)
+    if not run_from_ipython():
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setFormatter(logging.Formatter(conf.settings.LOGS_FORMAT))
+        logger.addHandler(console_handler)
     # create file handler which logs even debug messages
     log_file_path = f'{conf.settings.EXPERIMENT_BASE_LOGGING_DIR}/log'
 

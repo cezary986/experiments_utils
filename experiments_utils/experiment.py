@@ -4,7 +4,7 @@ import logging
 from typing import Any, Callable, Dict
 import os
 from datetime import datetime
-from .logs import*
+from .logs import *
 from . import conf
 from .events.emitter import EventEmitter
 from .events.handler import EventHandler
@@ -39,22 +39,33 @@ class Experiment:
     ) -> None:
         self.name: str = name
         self.paramsets: Dict[str, Dict[str, Any]] = paramsets
-        self._file_: str = _file_
+  
         self.n_jobs: str = n_jobs
         self.version: str = version
+
+        self.results: Dict[str, Any] = None
 
         self._event_queue: Queue = None
         self._event_handler: EventHandler = EventHandler()
         self._event_emitter: EventEmitter = None
-        if _file_ is None:
-            _file_ = inspect.stack()[2][1]
-        self.dir_path = os.path.dirname(os.path.realpath(_file_))
+        
+        self._file_: str = _file_
+        self.dir_path: str = self._resolve_active_dir()
         self.function: Callable = function
 
         self._logger: Logger = logging.getLogger(self.name)
         self._logger.setLevel(logging.DEBUG)
         self._remote_monitor: RemoteExperimentMonitor = None
         self.state = None
+
+    def _resolve_active_dir(self) -> str:
+        if run_from_ipython():
+            # when running from ipython __file__ inspect stact won't return correct path
+            return os.path.abspath(os.curdir)
+        else:
+            if self._file_ is None:
+               self. _file_ = inspect.stack()[2][1]
+            return  os.path.dirname(os.path.realpath(self._file_))
 
     def on_event(self, event_type: EventTypes):
         """Helper decorator to adding event listeners.
@@ -98,7 +109,13 @@ class Experiment:
                 f'Forwarding experiment logs to remote server: ' +
                 f'"{settings.REMOTE_LOGGING_URL}" run_id = {self._remote_monitor._run_id}')
 
-    def _run(self, paramsets: Dict[str, Dict[str, Any]] = None):
+    def _run(self, paramsets: Dict[str, Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Runs experiment
+    
+        Returns:
+            Dict[str, Any]: Experiment results returned from each calling of experiment function group by dictionary
+                where paramset names are keys.
+        """
         if paramsets is None and self.paramsets is None:
             raise Exception('''No paramsets were passed to experiment. Pass them either when calling experiment or in decorator.
     
@@ -172,9 +189,11 @@ Alternatively:
                 self._remote_monitor._mark_experiment_as_killed()
             self._event_emitter.emit_event(ExperimentEndEvent(self.name))
         finally:
+            self.results = self._event_handler._results
             if self._remote_monitor is not None:
                 self._remote_monitor.terminate()
             ExperimentContext.__GLOBAL_CONTEXT__ = None
+        return self.results
 
     __call__ = _run
 

@@ -9,7 +9,9 @@ from .context import ExperimentContext
 from .remote_logging import RemoteLogsHandler, RemoteExperimentMonitor
 from multiprocess.queues import Queue
 from multiprocess.pool import Pool
-from typing import Callable, Dict, List, Tuple
+from concurrent.futures import ThreadPoolExecutor
+from typing import Callable, Dict, List, Tuple, Any
+from .logs import run_from_ipython
 from . import conf
 
 
@@ -82,16 +84,17 @@ class Runner:
                 ))
                 start_time = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
 
-                experiment_function(*experiment_params.values())
+                result: Any = experiment_function(*experiment_params.values())
 
                 self._logger.info(f'Finished experiment for paramset: "{context.paramset_name}". Took: {datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE) - start_time}')
                 event_emitter.emit_event(ParamsetSuccessEvent(
                     self._name,
                     context.paramset_name,
-                    event_type=f'{context.paramset_name}__PARAMSET_SUCCESS'
+                    event_type=f'{context.paramset_name}__PARAMSET_SUCCESS',
+                    result=result
                 ))
                 event_emitter.emit_event(ParamsetSuccessEvent(
-                    self._name, context.paramset_name))
+                    self._name, context.paramset_name, result=result))
             except Exception as exception:
                 self._logger.info(f'Exception during experiment for paramset: "{context.paramset_name}". Took: {datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE) - start_time}')
                 stack_trace: str = traceback.format_exc()
@@ -133,7 +136,15 @@ class Runner:
             ) for paramset_name, paramset in experiment.paramsets.items()
         ]
         experiment_start_time = datetime.now(tz=conf.settings.EXPERIMENT_TIMEZONE)
-        with Pool(experiment.n_jobs) as executor:
+
+        if run_from_ipython():
+            pool = ThreadPoolExecutor(max_workers=experiment.n_jobs)
+            experiment._logger.warning('Running from Interactive Interpreter which is not supporting multiprocessing, will use multiprocessing instead.')
+            setattr(pool, 'map_async', pool.map)
+        else:
+            pool = Pool(experiment.n_jobs)
+
+        with pool as executor:
             executor.map_async(inner_wrapper, params_sets)
             experiment._event_handler.start_listening_for_events(
                 len(params_sets))
