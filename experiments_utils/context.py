@@ -1,8 +1,9 @@
 from __future__ import annotations
 from copy import deepcopy
 from logging import Logger
-from typing import List
-from .events.emitter import EventEmitter
+from typing import List, Dict
+from experiments_utils.events.emitter import EventEmitter
+from experiments_utils.plugins import Plugin
 
 
 class ExperimentContext:
@@ -18,7 +19,8 @@ class ExperimentContext:
         paramset_name: str,
         current_dir: str,
         version: str = None,
-        logger: Logger = None
+        logger: Logger = None,
+        plugins: Dict[str, Plugin] = {}
     ) -> None:
         self._name: str = name
         self._version: str = version
@@ -28,6 +30,7 @@ class ExperimentContext:
 
         self.logger: Logger = deepcopy(logger)
         self._logs_handlers = logger.handlers
+        self._plugins: Dict[str, Plugin] = plugins
 
     @property
     def name(self) -> str:
@@ -48,6 +51,10 @@ class ExperimentContext:
     @property
     def current_dir(self) -> str:
         return self._current_dir
+
+    @property
+    def plugins(self) -> Dict[str, Plugin]:
+        return self._plugins
 
     @staticmethod
     def get_instance() -> ExperimentContext:
