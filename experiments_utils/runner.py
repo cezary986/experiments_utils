@@ -139,7 +139,7 @@ class Runner:
 
         if run_from_ipython():
             pool = ThreadPoolExecutor(max_workers=experiment.n_jobs)
-            experiment._logger.warning('Running from Interactive Interpreter which is not supporting multiprocessing, will use multiprocessing instead.')
+            experiment._logger.warning('Running from Interactive Interpreter which is not supporting multiprocessing, will use threading instead.')
             setattr(pool, 'map_async', pool.map)
         else:
             pool = Pool(experiment.n_jobs)
