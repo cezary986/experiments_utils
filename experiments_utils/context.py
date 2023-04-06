@@ -3,7 +3,7 @@ from copy import deepcopy
 from logging import Logger
 from typing import List, Dict
 from experiments_utils.events.emitter import EventEmitter
-from experiments_utils.plugins import Plugin
+from experiments_utils.plugin import Plugin
 
 
 class ExperimentContext:

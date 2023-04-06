@@ -1,5 +1,5 @@
 from clearml import Task
-from experiments_utils.plugins import Plugin
+from experiments_utils.plugin import Plugin
 from experiments_utils.experiment import Experiment
 from experiments_utils.context import ExperimentContext
 from experiments_utils.events import EventTypes, StepStartEvent
