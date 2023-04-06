@@ -21,7 +21,7 @@ from experiments_utils.runner import Runner
 from experiments_utils.remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
 from experiments_utils.state import ExperimentStateManager, ExperimentState
 from experiments_utils.context import ExperimentContext
-from experiments_utils.plugins import Plugin
+from experiments_utils.plugin import Plugin
 
 
 class Experiment:
