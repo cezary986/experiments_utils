@@ -1,6 +1,6 @@
 from clearml import Task
 from experiments_utils.plugin import Plugin
-from typing import Dict
+from typing import Dict, Any
 from experiments_utils.experiment import Experiment
 from experiments_utils.context import ExperimentContext
 from experiments_utils.events import EventTypes, StepStartEvent
