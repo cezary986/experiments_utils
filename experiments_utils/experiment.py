@@ -1,22 +1,27 @@
 from __future__ import annotations
 from logging import Logger
 import logging
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 import os
 from datetime import datetime
-from .logs import *
-from . import conf
-from .events.emitter import EventEmitter
-from .events.handler import EventHandler
-from .events import EventTypes
-from .events.events import *
-from .runner import Runner
-from .remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
-from .state import ExperimentStateManager, ExperimentState
-from .context import ExperimentContext
 import inspect
 from multiprocess import Manager
 from multiprocess.queues import Queue
+from experiments_utils.logs import \
+    run_from_ipython, \
+    debugger_is_active, \
+    configure_logging, \
+    configure_experiment_logger
+from experiments_utils import conf
+from experiments_utils.events.emitter import EventEmitter
+from experiments_utils.events.handler import EventHandler
+from experiments_utils.events import EventTypes
+from experiments_utils.events.events import ExperimentStartEvent, ExperimentEndEvent
+from experiments_utils.runner import Runner
+from experiments_utils.remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
+from experiments_utils.state import ExperimentStateManager, ExperimentState
+from experiments_utils.context import ExperimentContext
+from experiments_utils.plugins import Plugin
 
 
 class Experiment:
@@ -39,16 +44,16 @@ class Experiment:
     ) -> None:
         self.name: str = name
         self.paramsets: Dict[str, Dict[str, Any]] = paramsets
-  
-        self.n_jobs: str = n_jobs
+
+        self.n_jobs: int = n_jobs
         self.version: str = version
 
-        self.results: Dict[str, Any] = None
+        self.results: Dict[str, Any]
 
         self._event_queue: Queue = None
         self._event_handler: EventHandler = EventHandler()
         self._event_emitter: EventEmitter = None
-        
+
         self._file_: str = _file_
         self.dir_path: str = self._resolve_active_dir()
         self.function: Callable = function
@@ -57,15 +62,28 @@ class Experiment:
         self._logger.setLevel(logging.DEBUG)
         self._remote_monitor: RemoteExperimentMonitor = None
         self.state = None
+        self.plugins: Dict = {}
+
+    @property
+    def logger(self) -> Logger:
+        return self._logger
+
+    def add_plugin(self, plugin: Plugin):
+        if plugin.name not in self.plugins:
+            self.plugins[plugin.name] = plugin
+        else:
+            raise ValueError(
+                f'Failed to add multiple plugins with same name: "{plugin.name}"'
+            )
 
     def _resolve_active_dir(self) -> str:
         if run_from_ipython():
             # when running from ipython __file__ inspect stact won't return correct path
             return os.path.abspath(os.curdir)
-        else:
-            if self._file_ is None:
-               self. _file_ = inspect.stack()[2][1]
-            return  os.path.dirname(os.path.realpath(self._file_))
+
+        if self._file_ is None:
+            self. _file_ = inspect.stack()[2][1]
+        return os.path.dirname(os.path.realpath(self._file_))
 
     def on_event(self, event_type: EventTypes):
         """Helper decorator to adding event listeners.
@@ -85,7 +103,7 @@ class Experiment:
         return self._event_handler.add_event_listener(event_type, handler)
 
     def _initilize_experiment_logger(self):
-        from . import settings as settings
+        from experiments_utils import settings  # pylint: disable=import-outside-toplevel
         conf.settings = settings
         current_time_str: str = datetime.now(
             tz=settings.EXPERIMENT_TIMEZONE).strftime("%d.%m.%Y_%H.%M.%S")
@@ -98,7 +116,7 @@ class Experiment:
         configure_experiment_logger(self._logger)
 
     def _initialize_remote_logger(self):
-        from . import settings as settings
+        from experiments_utils import settings  # pylint: disable=import-outside-toplevel
         if settings.REMOTE_LOGGING_ENABLED and not debugger_is_active():
             self._remote_monitor = RemoteExperimentMonitor()
             self._remote_monitor.bootstrap(experiment=self)
@@ -106,18 +124,18 @@ class Experiment:
             self._logger.addHandler(RemoteLogsHandler(
                 self._remote_monitor.logs_queue))
             self._logger.debug(
-                f'Forwarding experiment logs to remote server: ' +
+                'Forwarding experiment logs to remote server: ' +
                 f'"{settings.REMOTE_LOGGING_URL}" run_id = {self._remote_monitor._run_id}')
 
     def _run(self, paramsets: Dict[str, Dict[str, Any]] = None) -> Dict[str, Any]:
         """Runs experiment
-    
+
         Returns:
             Dict[str, Any]: Experiment results returned from each calling of experiment function group by dictionary
                 where paramset names are keys.
         """
         if paramsets is None and self.paramsets is None:
-            raise Exception('''No paramsets were passed to experiment. Pass them either when calling experiment or in decorator.
+            raise ValueError('''No paramsets were passed to experiment. Pass them either when calling experiment or in decorator.
     
 Example:
 
@@ -153,7 +171,7 @@ Alternatively:
         state_manager = ExperimentStateManager(self.state)
         state_manager.bootstrap(experiment=self)
 
-        from . import settings
+        from experiments_utils import settings  # pylint: disable=import-outside-toplevel
         conf.settings = settings
         logging.basicConfig(level=self._logger.level)
         self._initilize_experiment_logger()
@@ -186,10 +204,10 @@ Alternatively:
             runner.run(experiment=self)
         except KeyboardInterrupt:
             if self._remote_monitor is not None:
-                self._remote_monitor._mark_experiment_as_killed()
+                self._remote_monitor._mark_experiment_as_killed()  # pylint: disable=protected-access
             self._event_emitter.emit_event(ExperimentEndEvent(self.name))
         finally:
-            self.results = self._event_handler._results
+            self.results = self._event_handler._results  # pylint: disable=protected-access
             if self._remote_monitor is not None:
                 self._remote_monitor.terminate()
             ExperimentContext.__GLOBAL_CONTEXT__ = None
@@ -203,7 +221,8 @@ def experiment(
     paramsets: Dict[str, Dict[str, Any]] = None,
     _file_: str = None,
     n_jobs: int = 4,
-    version: str = None
+    version: str = None,
+    plugins: List[Plugin] = [],
 ):
     """Decorator for experiment functions
 
@@ -215,7 +234,7 @@ def experiment(
         version (str) version string, Default is None
     """
     def wrapper(function):
-        return Experiment(
+        experiment_instance = Experiment(
             name=name,
             paramsets=paramsets,
             _file_=_file_,
@@ -224,4 +243,7 @@ def experiment(
 
             function=function
         )
+        for plugin in plugins:
+            experiment_instance.add_plugin(plugin)
+        return experiment_instance
     return wrapper
