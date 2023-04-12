@@ -1,3 +1,4 @@
+from logging import Logger
 from multiprocess.queues import Queue
 from .event_types import EventTypes
 from .events import _BaseEvent, ExperimentEndEvent, ExperimentSuccessEvent, ParamsetSuccessEvent
@@ -6,7 +7,8 @@ from typing import Any, Callable, Dict, List, Union
 
 class EventHandler:
 
-    def __init__(self) -> None:
+    def __init__(self, logger: Logger) -> None:
+        self._logger: Logger = logger
         self._results: Dict[str, Any] = {}
         self._event_queue: Queue = None
         self._event_listeners: Dict[str, List[Callable]] = {
@@ -45,14 +47,22 @@ class EventHandler:
             return function
         return wrapper
 
+    def _call_listener(self, event: _BaseEvent, listener: Callable):
+        try:
+            listener(event)
+        except Exception as error:
+            self._logger.error(
+                "Error running event handler. It won't prevent further experiment execution but should be inspected.")
+            self._logger.exception(error, stack_info=True)
+
     def _handle_event(self, event: _BaseEvent = []):
         if event.event_type == EventTypes.EXPERIMENT_PARAMSET_SUCCESS.value:
             event: ParamsetSuccessEvent = event
             self._results[event.paramset_name] = event.result
         for listener in self._event_listeners.get(event.event_type, []):
-            listener(event)
+            self._call_listener(event, listener)
         for listener in self._event_listeners.get('*', []):
-            listener(event)
+            self._call_listener(event, listener)
 
     def start_listening_for_events(self, paramsets_count: int):
         finished_paramsets_counter: int = 0

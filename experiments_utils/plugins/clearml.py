@@ -23,7 +23,7 @@ class ClearMLPlugin(Plugin):
 
     @property
     def version(self) -> str:
-        return '1.0.0'
+        return '1.0.1'
 
     @property
     def task(self) -> Task:
@@ -52,4 +52,5 @@ class ClearMLPlugin(Plugin):
             self.task.mark_stopped()
         else:
             self.task.mark_failed()
+        self.task.flush(True)
         self.task.close()
