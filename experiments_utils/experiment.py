@@ -51,7 +51,7 @@ class Experiment:
         self.results: Dict[str, Any]
 
         self._event_queue: Queue = None
-        self._event_handler: EventHandler = EventHandler()
+
         self._event_emitter: EventEmitter = None
 
         self._file_: str = _file_
@@ -59,6 +59,7 @@ class Experiment:
         self.function: Callable = function
 
         self._logger: Logger = logging.getLogger(self.name)
+        self._event_handler: EventHandler = EventHandler(self.logger)
         self._logger.setLevel(logging.DEBUG)
         self._remote_monitor: RemoteExperimentMonitor = None
         self.state = None
