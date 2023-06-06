@@ -28,23 +28,11 @@ class Step:
             name (str): step name - used for logging
         """
         self.function: Callable = function
-        self._update_call_signature_to_much_function()
         self.name: str = name
         self.experiment_name: str = None
         self.paramset_name: str = None
         self.logger: Logger = None
         self._experiment_logger: Logger = None
-
-    def _update_call_signature_to_much_function(self):
-        if hasattr(func, "func"):
-            args = func.args + args
-            keywords = {**func.keywords, **keywords}
-            func = func.func
-
-        self.func = func
-        self.args = args
-        self.keywords = keywords
-        return self
 
     def run(self, *args, **kwargs):
         """Run step function"""
