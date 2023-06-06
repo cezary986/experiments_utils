@@ -28,11 +28,23 @@ class Step:
             name (str): step name - used for logging
         """
         self.function: Callable = function
+        self._update_call_signature_to_much_function()
         self.name: str = name
         self.experiment_name: str = None
         self.paramset_name: str = None
         self.logger: Logger = None
         self._experiment_logger: Logger = None
+
+    def _update_call_signature_to_much_function(self):
+        if hasattr(func, "func"):
+            args = func.args + args
+            keywords = {**func.keywords, **keywords}
+            func = func.func
+
+        self.func = func
+        self.args = args
+        self.keywords = keywords
+        return self
 
     def run(self, *args, **kwargs):
         """Run step function"""
@@ -134,14 +146,14 @@ def step(
     Args:
         name (str, optional): Optional step name. Defaults is step function name.
     """
-    def wrapper(function: Callable):
+    def wrapper(funct: Callable):
         # if step name is not given take function name
         _name = name
         if _name is None:
-            _name = function.__name__
+            _name = funct.__name__
         step = Step(
             name=_name,
-            function=function
+            function=funct
         )
         Step.__registered_steps__.append(step)
         return step

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from logging import Logger
 import logging
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 import os
 from datetime import datetime
 import inspect
@@ -37,13 +37,13 @@ class Experiment:
         self,
         function,
         name: str,
-        paramsets: Dict[str, Dict[str, Any]] = None,
+        paramsets: List[Tuple[str, Dict[str, Any]]] = None,
         _file_: str = None,
         n_jobs: int = 4,
         version: str = None
     ) -> None:
         self.name: str = name
-        self.paramsets: Dict[str, Dict[str, Any]] = paramsets
+        self.paramsets: List[Tuple[str, Dict[str, Any]]] = paramsets
 
         self.n_jobs: int = n_jobs
         self.version: str = version
@@ -128,7 +128,7 @@ class Experiment:
                 'Forwarding experiment logs to remote server: ' +
                 f'"{settings.REMOTE_LOGGING_URL}" run_id = {self._remote_monitor._run_id}')
 
-    def _run(self, paramsets: Dict[str, Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _run(self, paramsets: List[Tuple[str, Dict[str, Any]]] = None) -> Dict[str, Any]:
         """Runs experiment
 
         Returns:
@@ -168,7 +168,10 @@ Alternatively:
         if paramsets is not None:
             self.paramsets = paramsets
         self.state = ExperimentState(
-            self.name, self.version, list(self.paramsets.keys()))
+            self.name, 
+            self.version, 
+            list(map(lambda e: e[0], self.paramsets))
+        )
         state_manager = ExperimentStateManager(self.state)
         state_manager.bootstrap(experiment=self)
 
@@ -180,7 +183,7 @@ Alternatively:
         ExperimentContext.__GLOBAL_CONTEXT__ = ExperimentContext(
             name=self.name,
             version=self.version,
-            paramsets_names=list(self.paramsets.keys()),
+            paramsets_names=self.state.paramsets_names,
             paramset_name=None,
             current_dir=self.dir_path,
             logger=self._logger
@@ -219,7 +222,7 @@ Alternatively:
 
 def experiment(
     name: str,
-    paramsets: Dict[str, Dict[str, Any]] = None,
+    paramsets: List[Tuple[str, Dict[str, Any]]] = None,
     _file_: str = None,
     n_jobs: int = 4,
     version: str = None,
@@ -229,7 +232,7 @@ def experiment(
 
     Args:
         name (str): Name of experiment (used for generating results)
-        paramsets (Dict[str, Dict[str, Any]]): dictionary containing sets of parameters for experiment to run with
+        paramsets (List[Tuple[str, Dict[str, Any]]]): list containing sets of parameters for experiment to run with
         _file_ (str) optional __file__ variable from experiment main file. It will be automatically detected.
         max_threads (int) max number of threard, Default 8
         version (str) version string, Default is None

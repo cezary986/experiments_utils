@@ -77,7 +77,7 @@ class Runner:
     def run(self, experiment):
         self._name: str = experiment.name
         self._version: str = experiment.version
-        self._paramsets_names: str = list(experiment.paramsets.keys())
+        self._paramsets_names: str = list(map(lambda e: e[0], experiment.paramsets))
         self._dir_path: str = experiment.dir_path
         self._logger: str = experiment._logger
         self._event_queue: Queue = experiment._event_handler.event_queue
@@ -188,7 +188,7 @@ class Runner:
                     }
                 ),
                 EventEmitter(self._event_queue)
-            ) for paramset_name, paramset in experiment.paramsets.items()
+            ) for paramset_name, paramset in experiment.paramsets
         ]
         experiment_start_time = datetime.now(
             tz=conf.settings.EXPERIMENT_TIMEZONE)
