@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name='experiments_utils',
@@ -9,5 +9,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         'multiprocess==0.70.13',
+        'dill==0.3.8',
     ],
 )

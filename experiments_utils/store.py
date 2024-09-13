@@ -1,6 +1,8 @@
-import pickle
 import os
 from typing import Any
+
+import dill
+
 from .context import ExperimentContext
 
 
@@ -40,12 +42,12 @@ class Store(object):
             self, '__params_base_dir_path'), exist_ok=True)
         path = f'{object.__getattribute__(self, "__params_base_dir_path")}/{name}.pickle'
         with open(path, 'wb+') as params_file:
-            pickle.dump(value, params_file)
+            dill.dump(value, params_file)
 
     def __retrieve_variable(self, name: str) -> Any:
         var_file_path = f'{object.__getattribute__(self, "__params_base_dir_path")}/{name}.pickle'
         if os.path.exists(var_file_path):
             with open(var_file_path, 'rb') as var_file:
-                return pickle.load(var_file)
+                return dill.load(var_file)
         else:
             raise NameError(f"name '{name}' is not defined")
