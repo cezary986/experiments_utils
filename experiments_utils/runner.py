@@ -1,19 +1,21 @@
 import copy
-from logging import Logger, basicConfig
 import logging
 import sys
-from time import sleep
 import traceback
+from concurrent.futures import ThreadPoolExecutor
+from logging import Logger, basicConfig
+from time import sleep
+from typing import Any, Callable, Dict, List, Tuple
+
+from multiprocess.pool import Pool
+from multiprocess.queues import Queue
+
+from . import conf
+from .context import ExperimentContext
 from .events.emitter import EventEmitter
 from .events.events import *
-from .context import ExperimentContext
-from .remote_logging import RemoteLogsHandler, RemoteExperimentMonitor
-from multiprocess.queues import Queue
-from multiprocess.pool import Pool
-from concurrent.futures import ThreadPoolExecutor
-from typing import Callable, Dict, List, Tuple, Any
 from .logs import run_from_ipython
-from . import conf
+from .remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
 
 
 class Runner:
@@ -182,6 +184,7 @@ class Runner:
                     paramsets_names=self._paramsets_names,
                     paramset_name=paramset_name,
                     current_dir=self._dir_path,
+                    logs_dir=experiment.logs_dir,
                     logger=self._logger,
                     plugins={
                         key: plugin.clone() for key, plugin in experiment.plugins.items()

@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import sys
+
 from . import conf
 
 logging_levels = [
@@ -38,7 +39,9 @@ def configure_logging(_file_, run_log_dir: str, dir_path: str):
     os.makedirs(conf.settings.EXPERIMENT_BASE_LOGGING_DIR, exist_ok=True)
 
 def get_step_logger(name: str, config_key: str) -> logging.Logger:
-    log_file_path = f'{conf.settings.EXPERIMENT_BASE_LOGGING_DIR}/{config_key}/{name}'
+    from experiments_utils.context import ExperimentContext
+    context: ExperimentContext = ExperimentContext.get_instance()
+    log_file_path = f'{context.logs_path}/{config_key}/{name}'
     os.makedirs(log_file_path, exist_ok=True)
     log_file_path = f'{log_file_path}/{name}'
     logger = logging.getLogger(f'{name}.{config_key}')

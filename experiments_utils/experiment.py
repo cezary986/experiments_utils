@@ -1,27 +1,30 @@
 from __future__ import annotations
-from logging import Logger
+
+import inspect
 import logging
-from typing import Any, Callable, Dict, List, Tuple
 import os
 from datetime import datetime
-import inspect
+from logging import Logger
+from typing import Any, Callable, Dict, List, Tuple
+
 from multiprocess import Manager
 from multiprocess.queues import Queue
-from experiments_utils.logs import \
-    run_from_ipython, \
-    debugger_is_active, \
-    configure_logging, \
-    configure_experiment_logger
+
 from experiments_utils import conf
-from experiments_utils.events.emitter import EventEmitter
-from experiments_utils.events.handler import EventHandler
-from experiments_utils.events import EventTypes
-from experiments_utils.events.events import ExperimentStartEvent, ExperimentEndEvent
-from experiments_utils.runner import Runner
-from experiments_utils.remote_logging import RemoteExperimentMonitor, RemoteLogsHandler
-from experiments_utils.state import ExperimentStateManager, ExperimentState
 from experiments_utils.context import ExperimentContext
+from experiments_utils.events import EventTypes
+from experiments_utils.events.emitter import EventEmitter
+from experiments_utils.events.events import (ExperimentEndEvent,
+                                             ExperimentStartEvent)
+from experiments_utils.events.handler import EventHandler
+from experiments_utils.logs import (configure_experiment_logger,
+                                    configure_logging, debugger_is_active,
+                                    run_from_ipython)
 from experiments_utils.plugin import Plugin
+from experiments_utils.remote_logging import (RemoteExperimentMonitor,
+                                              RemoteLogsHandler)
+from experiments_utils.runner import Runner
+from experiments_utils.state import ExperimentState, ExperimentStateManager
 
 
 class Experiment:
@@ -58,6 +61,7 @@ class Experiment:
         self.dir_path: str = self._resolve_active_dir()
         self.function: Callable = function
 
+        self.logs_dir: str = None
         self._logger: Logger = logging.getLogger(self.name)
         self._event_handler: EventHandler = EventHandler(self.logger)
         self._logger.setLevel(logging.DEBUG)
@@ -104,7 +108,8 @@ class Experiment:
         return self._event_handler.add_event_listener(event_type, handler)
 
     def _initilize_experiment_logger(self):
-        from experiments_utils import settings  # pylint: disable=import-outside-toplevel
+        from experiments_utils import \
+            settings  # pylint: disable=import-outside-toplevel
         conf.settings = settings
         current_time_str: str = datetime.now(
             tz=settings.EXPERIMENT_TIMEZONE).strftime("%d.%m.%Y_%H.%M.%S")
@@ -115,9 +120,11 @@ class Experiment:
 
         configure_logging(self._file_, logs_dir_name, self.dir_path)
         configure_experiment_logger(self._logger)
+        self.logs_dir = conf.settings.EXPERIMENT_BASE_LOGGING_DIR
 
     def _initialize_remote_logger(self):
-        from experiments_utils import settings  # pylint: disable=import-outside-toplevel
+        from experiments_utils import \
+            settings  # pylint: disable=import-outside-toplevel
         if settings.REMOTE_LOGGING_ENABLED and not debugger_is_active():
             self._remote_monitor = RemoteExperimentMonitor()
             self._remote_monitor.bootstrap(experiment=self)
@@ -175,7 +182,8 @@ Alternatively:
         state_manager = ExperimentStateManager(self.state)
         state_manager.bootstrap(experiment=self)
 
-        from experiments_utils import settings  # pylint: disable=import-outside-toplevel
+        from experiments_utils import \
+            settings  # pylint: disable=import-outside-toplevel
         conf.settings = settings
         logging.basicConfig(level=self._logger.level)
         self._initilize_experiment_logger()
@@ -186,6 +194,7 @@ Alternatively:
             paramsets_names=self.state.paramsets_names,
             paramset_name=None,
             current_dir=self.dir_path,
+            logs_dir=self.logs_dir,
             logger=self._logger
         )
 

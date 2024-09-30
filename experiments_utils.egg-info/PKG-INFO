@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: experiments_utils
+Version: 3.0.0
+Summary: Microframework to speed up writing scientific experiment code
+Author: Cezary Maszczyk
+Author-email: cezary.maszczyk@gmail.com
+Requires-Dist: multiprocess==0.70.13
+Requires-Dist: dill==0.3.8
