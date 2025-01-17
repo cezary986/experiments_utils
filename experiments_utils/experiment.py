@@ -135,7 +135,7 @@ class Experiment:
                 'Forwarding experiment logs to remote server: ' +
                 f'"{settings.REMOTE_LOGGING_URL}" run_id = {self._remote_monitor._run_id}')
 
-    def _run(self, paramsets: List[Tuple[str, Dict[str, Any]]] = None) -> Dict[str, Any]:
+    def run(self, paramsets: List[Tuple[str, Dict[str, Any]]] = None) -> Dict[str, Any]:
         """Runs experiment
 
         Returns:
@@ -226,7 +226,7 @@ Alternatively:
             ExperimentContext.__GLOBAL_CONTEXT__ = None
         return self.results
 
-    __call__ = _run
+    __call__ = run
 
 
 def experiment(

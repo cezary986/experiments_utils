@@ -16,4 +16,4 @@ def sort_dataset_by_complexity(
         dataset: Union[pd.DataFrame, np.ndarray] = dataset_accessor(dataset_name)
         dataset_complexity: int = calculate_df_complexity(dataset)
         sorted_datasets.append({'name': dataset_name, 'complexity': dataset_complexity})
-    return sorted(sorted_datasets, key=lambda e: e['complexity'])    
+    return sorted(sorted_datasets, key=lambda e: e['complexity'])
