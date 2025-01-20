@@ -98,7 +98,10 @@ def concat_tables(tables: List[Table], result: Table):
 
 
 def mean_aggregate_tables(
-    tables: List[Table], result: Table, cv_fold_column: str = None
+    tables: List[Table],
+    result: Table,
+    cv_fold_column: str = None,
+    add_std_columns: bool = False,
 ):
     """Mean aggregate tables. For nominal columns, mode value is used as aggregated
     value
@@ -108,6 +111,8 @@ def mean_aggregate_tables(
         result (Table): result table for storing aggregated data
         cv_fold_column (str, optional): optional name of the cv fold column to drop
             during aggregation. Defaults to None.
+        add_std_columns (bool, optional): If true, it will add columns containing std
+        for each numerical column named "${COLUMN_NAME} (std)". Defaults to False.
     """
     df: pd.DataFrame = pd.concat([table.as_pandas() for table in tables])
     result.set_df(df)
@@ -127,5 +132,10 @@ def mean_aggregate_tables(
     )
     if cv_fold_column:
         del aggregate_dict[cv_fold_column]
-    df = pd.DataFrame(df.aggregate(aggregate_dict)).T.reset_index(drop=True)
-    result.set_df(df)
+    agg_df = pd.DataFrame(df.aggregate(aggregate_dict)).T.reset_index(drop=True)
+
+    if add_std_columns:
+        for numeric_col in df.select_dtypes(include=[np.number]):
+            agg_df[f"{str(numeric_col)} (std)"] = df[numeric_col].std()
+
+    result.set_df(agg_df)
