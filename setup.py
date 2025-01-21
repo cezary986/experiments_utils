@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='experiments_utils',
-    version='3.0.0',
+    version='3.0.1',
     author='Cezary Maszczyk',
     author_email='cezary.maszczyk@gmail.com',
     description='Microframework to speed up writing scientific experiment code',
