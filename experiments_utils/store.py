@@ -4,6 +4,8 @@ from typing import Any
 
 import cloudpickle
 
+from experiments_utils import conf
+
 from .context import ExperimentContext
 
 
@@ -45,9 +47,11 @@ class Store(object):
         """
         context: ExperimentContext = ExperimentContext.__GLOBAL_CONTEXT__
         object.__setattr__(self, "__variables__", {})
-        params_file_path = (
-            f"{context.current_dir}/_cache/{context.version}/{context.paramset_name}"
-        )
+
+        if conf.settings.EXPERIMENT_CACHE_DIR is None:
+            params_file_path = f"{context.current_dir}/_cache/{context.version}/{context.paramset_name}"
+        else:
+            params_file_path = f"{conf.settings.EXPERIMENT_CACHE_DIR}/_cache/{context.version}/{context.paramset_name}"
         object.__setattr__(self, "__params_base_dir_path", params_file_path)
 
     def __getattribute__(self, name: str) -> Any:
